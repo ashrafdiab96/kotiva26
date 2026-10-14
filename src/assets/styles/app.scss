@@ -55,7 +55,17 @@
 @import './01-settings/global';
 @import './01-settings/breakpoints';
 
-@import './02-generic/reset';
+/* KOTIVA: Raed's element-level resets, form and button styles apply ONLY to the Raed pages
+   kept in this theme (customer area, loyalty, brands, testimonials, thank-you, and the
+   product-options partial) — <body class="kotiva-raed"> or a .kotiva-raed wrapper. On every
+   other page they would restyle KOTIVA's own markup (h1 sizes, a:focus outline removal,
+   16px !important inputs, a second .btn). See docs/DECISIONS.md T-06. */
+.kotiva-raed {
+  @import './02-generic/raed-preflight';
+  @import './02-generic/reset';
+  @import './03-elements/form';
+  @import './03-elements/buttons';
+}
 @import './02-generic/common';
 @import './02-generic/tooltip';
 @import './02-generic/animations';
@@ -64,8 +74,6 @@
 @import './02-generic/ltr';
 @import './02-generic/mixins';
 
-@import './03-elements/form';
-@import './03-elements/buttons';
 @import './03-elements/radio';
 @import './03-elements/radio-images';
 @import './03-elements/product-card';

@@ -1,0 +1,55 @@
+{# The reference page's @push('scripts'), verbatim. #}
+<script>
+/* ── FAQ — items are server-rendered in #faq-grid above; JS only wires the accordion toggle ── */
+
+function toggleFAQ(i) {
+  const item = document.getElementById(`faq-${i}`);
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => {
+    el.classList.remove('open');
+    el.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+  });
+  if (!isOpen) {
+    item.classList.add('open');
+    item.querySelector('.faq-q').setAttribute('aria-expanded', 'true');
+  }
+}
+
+/* ── CONTACT FORM ─────────────────────────────────────────── */
+/* E1 (2026-08-03 review, slide 3): the three Where-to-Buy CTAs all scroll to the same form.
+   The link itself always worked, but every CTA landed on an unset "Select enquiry type",
+   so the intent the visitor just expressed by clicking was dropped. Carry it into the form. */
+document.querySelectorAll('.wtb-card a[data-enquiry]').forEach(function (link) {
+  link.addEventListener('click', function () {
+    var field = document.getElementById('cf-subject');
+    if (field) field.value = link.dataset.enquiry;
+  });
+});
+
+function handleContact(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = form.querySelector('.form-submit');
+  const success = document.getElementById('cf-success');
+  const errorEl = document.getElementById('cf-error');
+  errorEl.style.display = 'none';
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+
+  kotivaSubmitToInbox({
+    type: 'contact',
+    name: document.getElementById('cf-name').value,
+    email: document.getElementById('cf-email').value,
+    enquiryType: document.getElementById('cf-subject').value,
+    message: document.getElementById('cf-message').value
+  }).then(() => {
+    btn.style.display = 'none';
+    success.style.display = 'block';
+    form.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+  }).catch(() => {
+    btn.textContent = 'Send Message';
+    btn.disabled = false;
+    errorEl.style.display = 'block';
+  });
+}
+</script>

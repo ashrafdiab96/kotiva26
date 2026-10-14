@@ -1,72 +1,69 @@
-<footer data-testid="store-footer" class="store-footer">
-	<div aria-label="footer" class="store-footer__inner">
-		<div class="container grid grid-col-1 lg:grid-cols-6 gap-8 lg:gap-6">
-			<div class="lg:col-span-2 rtl:lg:pl-20 ltr:lg:pr-20">
-				<a href="{{ link('/') }}" class="flex items-center m-0">
-					<h3>{{store.name}}</h3>
-				</a>
-				{% if store.description %}
-					<div class="max-w-sm leading-6 mb-6">
-						{{ store.description|raw }}
-          </div>
-				{% endif %}
+{#
+  KOTIVA footer — the reference layout's markup verbatim, with Salla URLs.
 
-				<div class="hidden lg:block">
-					<salla-social data-testid="store-footer-social" class="block mb-6"></salla-social>
-				</div>
+  Shop links open the KOTIVA listing pre-filtered (?filter=<key>, the query contract the
+  listing honours). "Face Care" maps to `cleanser`, exactly as the reference's
+  Salla::LEGACY_FILTERS did (D-35 item 1, client still to confirm).
 
-		<div class="flex gap-4">
-		  {# trust badges #}
-		  <salla-trust-badges data-testid="store-footer-trust-badges" {% if theme.settings.get('footer_is_dark') %} dark {% endif %}></salla-trust-badges>
-          {# vat #}
-          {% if store.settings.tax.number %}
-            <div class="flex rtl:space-x-reverse space-x-2 items-end">
-              {% if store.settings.tax.certificate %}
-                <a class="load-img-onclick" data-modal-id="modal-value-tax" href="#/" alt="{{ store.settings.tax.number }}">
-                  <img width="40" height="50" src="{{'images/tax.png' | cdn(70,70)}}" loading="lazy" class="w-10 rounded-sm hover:opacity-80 transition-opacity" alt="value added tax">
-                </a>
-              {% endif %}
-              <div>
-                <p class="text-sm text-text-grey mb-1">{{ trans('common.elements.tax_number') }}</p>
-                <b class="text-sm">{{ store.settings.tax.number }}</b>
-              </div>
-            </div>
-
-            {% if store.settings.tax.certificate %}
-              <salla-modal data-testid="store-footer-tax-modal" sub-title-first sub-title="{{ trans('common.elements.tax_number') }}" modal-title="{{ store.settings.tax.number }}" id="modal-value-tax">
-                <div class="flex justify-center max-w-full">
-                  <img class="w-full" loading="lazy"
-                  data-src="{{ store.settings.tax.certificate }}"
-                  alt="{{ store.settings.tax.number }}"/>
-                </div>
-              </salla-modal>
+  Social: while no URL is configured the icons stay non-interactive marks with the
+  "Coming soon" caption (the current design). A configured URL turns that icon into a link,
+  as the reference's own markup comment prescribes; the caption shows only while none is set.
+#}
+{% set shop = theme.settings.get('kotiva_url_shop') %}
+{% set social = {
+  instagram: (theme.settings.get('social_instagram') ?? '')|trim,
+  tiktok: (theme.settings.get('social_tiktok') ?? '')|trim,
+  facebook: (theme.settings.get('social_facebook') ?? '')|trim
+} %}
+{% set icons = {
+  instagram: {label: 'Instagram', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>'},
+  tiktok: {label: 'TikTok', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg>'},
+  facebook: {label: 'Facebook', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>'}
+} %}
+{% set any_social = social.instagram != '' or social.tiktok != '' or social.facebook != '' %}
+<!-- ═══════════════════════════════════════
+     FOOTER — ritual
+═══════════════════════════════════════ -->
+<footer class="footer" data-theme="ritual" role="contentinfo" data-testid="store-footer">
+  <div class="container">
+    <div class="footer-main">
+      <div>
+        <a class="footer-brand-link" href="{{ theme.settings.get('kotiva_url_home') }}" aria-label="KOTIVA — home"><img class="footer-brand-logo logo-dark" src="{{ 'kotiva/assets/kotiva-logo.svg'|asset }}" alt="" /></a>
+        <p class="footer-tagline mt-16">Doctor-approved skincare. Perfected by science. Tailored for you.</p>
+        <div class="footer-social" aria-label="{{ any_social ? 'Social media' : 'Social media — accounts coming soon' }}">
+          {% for key in ['instagram', 'tiktok', 'facebook'] %}
+            {% if social[key] != '' %}
+              <a class="footer-social-icon" href="{{ social[key] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ icons[key].label }}">{{ icons[key].svg|raw }}</a>
+            {% else %}
+              <span class="footer-social-icon" role="img" aria-label="{{ icons[key].label }}">{{ icons[key].svg|raw }}</span>
             {% endif %}
-          {% endif %}
+          {% endfor %}
         </div>
-        </div>
-
-			<div>
-				<h3>{{ trans('blocks.footer.pages_links') }}</h3>
-				<salla-menu data-testid="store-footer-menu" source="footer" with-cookie-preferences></salla-menu>
-			</div>
-
-			<div>
-				<salla-contacts data-testid="store-footer-contacts"></salla-contacts>
-
-				<div class="lg:hidden contact-social">
-					<salla-social data-testid="store-footer-social-mobile"></salla-social>
-				</div>
-			</div>
-
-			<salla-apps-icons data-testid="store-footer-apps" class="lg:col-span-2 rtl:lg:pr-20 ltr:lg:pl-20"></salla-apps-icons>
-
-		</div>
-	</div>
-
-	<div class="md:flex items-center justify-between py-4 container text-center">
-		<span class="text-sm copyright-text">{% hook copyright %}</span>
-		<salla-payments data-testid="store-footer-payments"></salla-payments>
-	</div>
-</div>
-
-<span class="hidden bottom-2 rtl:pl-24 ltr:pr-24 md:grid-cols-3 opacity-40"></span></footer>
+        {% if not any_social %}<span class="footer-social-soon">Coming soon</span>{% endif %}
+      </div>
+      <div><div class="footer-col-title">Shop</div>
+        <nav class="footer-links" aria-label="Shop links">
+          <a href="{{ shop }}">All Products</a><a href="{{ shop }}?filter=cleanser">Face Care</a>
+          <a href="{{ shop }}?filter=body">Body Care</a><a href="{{ shop }}?filter=serums">Serums</a>
+          <a href="{{ shop }}?filter=spf">SPF</a><a href="{{ shop }}?filter=hair">Hair</a>
+        </nav>
+      </div>
+      <div><div class="footer-col-title">Company</div>
+        <nav class="footer-links" aria-label="Company links">
+          <a href="{{ theme.settings.get('kotiva_url_about') }}" data-kotiva-nav="about">About Kotiva</a><a href="{{ theme.settings.get('kotiva_url_science') }}" data-kotiva-nav="science">Our Science</a><a href="{{ theme.settings.get('kotiva_url_ingredients') }}" data-kotiva-nav="ingredients">Ingredient Glossary</a>
+          <a href="{{ theme.settings.get('kotiva_url_routine_finder') }}" data-kotiva-nav="routine_finder">Routine Finder</a><a href="{{ theme.settings.get('kotiva_url_journal') }}" data-kotiva-nav="journal">Journal</a><a href="{{ theme.settings.get('kotiva_url_home') }}#newsletter">Newsletter</a>
+          <a href="{{ theme.settings.get('kotiva_url_contact') }}" data-kotiva-nav="contact">Contact Us</a><a href="{{ theme.settings.get('kotiva_url_company_profile') }}" target="_blank" rel="noopener">Company Profile (PDF)</a>
+        </nav>
+      </div>
+      <div><div class="footer-col-title">Support</div>
+        <nav class="footer-links" aria-label="Support links">
+          <a href="{{ theme.settings.get('kotiva_url_privacy_policy') }}" data-kotiva-nav="privacy_policy">Privacy Policy</a><a href="{{ theme.settings.get('kotiva_url_terms') }}" data-kotiva-nav="terms">Terms of Use</a><a href="{{ theme.settings.get('kotiva_url_contact') }}#faq">FAQ</a>
+        </nav>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 KOTIVA&trade;, a brand of Vitakode LLC. All rights reserved.</span>
+      <span>Doctor-approved skincare tailored for you.</span>
+    </div>
+  </div>
+</footer>

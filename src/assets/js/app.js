@@ -13,7 +13,9 @@ class App extends AppHelpers {
   loadTheApp() {
     this.commonThings();
     this.initiateNotifier();
-    this.initiateMobileMenu();
+    // KOTIVA: the header and its mobile overlay are the reference's own (layout.js drives
+    // them). Raed's mmenu (#mobile-menu) and "more" menu (#more-menu-dropdown) do not exist,
+    // and their element waits would poll forever, so neither is started.
     if (header_is_sticky) {
       this.initiateStickyMenu();
     }
@@ -22,13 +24,6 @@ class App extends AppHelpers {
     this.initiateModals();
     this.initiateCollapse();
     
-    // Ensure #more-menu-dropdown exists before running changeMenuDirection
-    const menuDirInterval = setInterval(() => {
-      if (document.querySelector('#more-menu-dropdown')) {
-        this.changeMenuDirection();
-        clearInterval(menuDirInterval);
-      }
-    }, 100);
 
     initTootTip();
     this.loadModalImgOnclick();
@@ -279,7 +274,8 @@ isElementLoaded(selector){
     });
 
     salla.cart.event.onItemAdded((response, prodId) => {
-      app.element('salla-cart-summary').animateToCart(app.element(`#product-${prodId} img`));
+      // KOTIVA: the header's cart is the reference's own link + badge, not <salla-cart-summary>.
+      app.element('salla-cart-summary')?.animateToCart(app.element(`#product-${prodId} img`));
     });
   }
 }

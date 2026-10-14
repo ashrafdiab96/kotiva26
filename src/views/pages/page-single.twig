@@ -1,38 +1,65 @@
 {#
-| Variable     | Type                  | Description |
-|--------------|-----------------------|-------------|
-| page         | Page                  |             |
-| page.title   | string                |             |
-| page.content | string                |             |
-| page.url     | string                |             |
-| page.slug    | string                |             |
-| page.type    | string                |             |
+  Salla pages → KOTIVA pages.
+
+  Salla gives every merchant page the same page.slug ("page-single") and a URL built from its
+  title (/<title-slug>/page-<id>), so the brief's dispatch-by-slug cannot work as written.
+  A page is recognised as KOTIVA page <key> by, in order:
+    1. its id matching Theme settings → "KOTIVA pages" (kotiva_page_<key>; the same
+       setting the nav links use), or
+    2. its content being the marker  kotiva:<key>  (e.g. kotiva:routine-finder), or
+    3. a URL segment equal to the key's slug (a page titled "Routine Finder" lives at
+       /routine-finder/page-<id>).
+  It then renders pages/kotiva/<slug>.twig (+ <slug>-pre-scripts / <slug>-scripts, the
+  reference's @push('pre_scripts') / @push('scripts'), when they exist). Any other page falls
+  back to Raed's generic rendering inside the KOTIVA chrome. See docs/DECISIONS.md T-05.
+
+| Variable     | Type   | Description |
+|--------------|--------|-------------|
+| page         | Page   | id, title, content, url, slug ("page-single"), type |
 #}
 {% extends "layouts.master" %}
-{% block content %}
-    {% if page.type == 'customised' %}
-      {#
-          Hook: information_page.information_page
-          Fires before the main informative page content section.
-          Use this hook to inject custom content or components above the page content area.
-      #}
-      <div class="s-blocks-wrapper s-information-page !mt-0">{% hook 'information_page.information_page' %}</div>
-    {% else %}
-      <div class="container">
-          {# add breadcumbs container in pages to make a space in case breadcrumbs is off #}
-          <nav class="breadcrumbs w-full py-5">
-              <salla-breadcrumb></salla-breadcrumb>
-          </nav>
 
-          <div class="flex justify-center">
-              <div class="content content--single-page w-full lg:w-10/12 bg-white rounded p-6 lg:p-8 mt-4 lg:mt-12">
-                  <h1 class="font-bold text-2xl mb-6">{{ page.title }}</h1>
-                  <div class="content-entry">
-                      {{ page.content|raw }}
-                  </div>
-                  <salla-comments data-testid="store-page-comments" item-id="{{page.id}}" type="page"></salla-comments>
-              </div>
-          </div>
-      </div>
-    {% endif %}
+{% set kotiva_keys = {
+  about: 'about', science: 'science', contact: 'contact', ingredients: 'ingredients',
+  routine_finder: 'routine-finder', privacy_policy: 'privacy-policy', terms: 'terms'
+} %}
+{% set kotiva_page = null %}
+{% set marker = (page.content ?? '')|striptags|trim|lower|replace({'[': '', ']': '', ' ': ''}) %}
+{% set url_parts = (page.url ?? '')|split('?')|first|split('/') %}
+{% for key, slug in kotiva_keys %}
+  {% set configured = (theme.settings.get('kotiva_page_' ~ key) ?? '')|trim %}
+  {% if not kotiva_page and configured != '' and (configured == (page.id ~ '') or configured ends with ('/page-' ~ page.id) or configured ends with ('/page-' ~ page.id ~ '/')) %}
+    {% set kotiva_page = slug %}
+  {% endif %}
+{% endfor %}
+{% if not kotiva_page %}
+  {% for key, slug in kotiva_keys %}
+    {% if not kotiva_page and (marker == 'kotiva:' ~ slug or marker == 'kotiva:' ~ key) %}{% set kotiva_page = slug %}{% endif %}
+  {% endfor %}
+{% endif %}
+{% if not kotiva_page %}
+  {% for key, slug in kotiva_keys %}
+    {% if not kotiva_page and slug in url_parts %}{% set kotiva_page = slug %}{% endif %}
+  {% endfor %}
+{% endif %}
+
+{% block body_class %}{{ kotiva_page ? '' : 'kotiva-raed' }}{% endblock %}
+{% block body_attrs %}{% if kotiva_page %} data-kotiva-page="{{ kotiva_page }}"{% endif %}{% endblock %}
+
+{% block pre_scripts %}
+  {% if kotiva_page %}{% include 'pages.kotiva.' ~ kotiva_page ~ '-pre-scripts' ignore missing %}{% endif %}
+{% endblock %}
+
+{% block content %}
+  {% if kotiva_page %}
+    {% include 'pages.kotiva.' ~ kotiva_page %}
+  {% elseif page.type == 'customised' %}
+    <div class="s-blocks-wrapper s-information-page !mt-0">{% hook 'information_page.information_page' %}</div>
+  {% else %}
+    {% include 'pages.partials.raed-page' %}
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  {% if kotiva_page %}{% include 'pages.kotiva.' ~ kotiva_page ~ '-scripts' ignore missing %}{% endif %}
 {% endblock %}

@@ -1,0 +1,145 @@
+{#
+  KOTIVA Privacy Policy — resources/views/pages/privacy-policy.blade.php ported 1:1 (markup, copy and the page's own
+  styles verbatim; only URLs and asset paths changed). Rendered by pages/page-single.twig.
+  The site host in the text is this store's host (store.url), as the reference printed APP_URL's.
+#}
+<style>
+.legal-hero {
+  padding-top: calc(var(--nav-h) + 80px);
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--border);
+}
+.draft-banner {
+  background: var(--bg-alt);
+  border: 1px solid var(--border-strong);
+  padding: 20px 24px;
+  margin-top: 28px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg-mid);
+  max-width: 640px;
+}
+.draft-banner strong { color: var(--fg); }
+.legal-content { padding: var(--gap-section) 0; }
+.legal-content-inner { max-width: 760px; margin: 0 auto; }
+.legal-content-inner h2 {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin: 48px 0 16px;
+}
+.legal-content-inner h2:first-child { margin-top: 0; }
+.legal-content-inner p, .legal-content-inner li {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--fg-mid);
+  font-family: var(--font-body);
+  margin-bottom: 16px;
+}
+.legal-content-inner ul { padding-left: 20px; margin-bottom: 16px; }
+.legal-content-inner li { margin-bottom: 8px; }
+.legal-content-inner a { color: var(--accent-deep); text-decoration: underline; }
+.legal-meta {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-bottom: 32px;
+}
+</style>
+  <header class="legal-hero">
+    <div class="container">
+      <p class="t-eyebrow reveal" style="margin-bottom:16px;">Legal</p>
+      <h1 class="t-display reveal reveal-delay-1" style="margin-bottom:0;">PRIVACY<br>POLICY</h1>
+      <div class="draft-banner reveal reveal-delay-2">
+        <strong>Draft — pending legal review.</strong> This page is a template prepared for internal
+        review and has not yet been approved as kotiva™'s final Privacy Policy. Do not treat this as
+        legally binding until it is reviewed and confirmed.
+      </div>
+    </div>
+  </header>
+
+  <section class="legal-content">
+    <div class="container">
+      <div class="legal-content-inner reveal">
+        <p class="legal-meta">Last updated: 5 July 2026 (draft)</p>
+
+        <h2>1. Who We Are</h2>
+        <p>This website ({{ (store.url|split('/'))[2] ?? '' }}, the "Site") is operated by <strong>Vitakode
+        LLC</strong>, a company registered in Muscat, Sultanate of Oman ("kotiva™", "we", "us", or "our").
+        We are the data controller responsible for your personal data collected through this Site.</p>
+
+        <h2>2. Information We Collect</h2>
+        <p>We collect information you provide directly to us, including:</p>
+        <ul>
+          <li>Contact details submitted through our contact form (name, email address, enquiry type, message)</li>
+          <li>Email address submitted through our newsletter sign-up</li>
+          <li>Any information you provide when contacting us by email or phone</li>
+        </ul>
+        <p>We do not currently operate online ordering, so we do not collect payment or shipping
+        information through this Site. If and when online ordering launches, this policy will be
+        updated to describe the additional data collected (e.g. delivery address, order history).</p>
+
+        <h2>3. How We Use Your Information</h2>
+        <p>We use the information we collect to:</p>
+        <ul>
+          <li>Respond to your enquiries and provide customer support</li>
+          <li>Send you newsletter updates, if you have opted in, about new products, routines, and offers</li>
+          <li>Improve our Site and product offering</li>
+          <li>Comply with our legal obligations</li>
+        </ul>
+
+        <h2>4. Legal Basis for Processing</h2>
+        <p>We process your personal data on the basis of your consent (for newsletter sign-ups and
+        voluntary enquiries) and our legitimate interest in responding to enquiries and operating our
+        business.</p>
+
+        <h2>5. Sharing Your Information</h2>
+        <p>We do not sell your personal data. We may share it with trusted service providers who help
+        us operate the Site (for example, email delivery and website hosting providers), who are
+        obligated to keep your data confidential and use it only to provide services to us. We do not
+        currently share data with a CRM or marketing platform; if this changes, we will update this
+        policy accordingly.</p>
+
+        <h2>6. Data Retention</h2>
+        <p>We retain contact form submissions and newsletter sign-up data for as long as necessary to
+        respond to your enquiry or for as long as you remain subscribed, unless a longer retention
+        period is required by law.</p>
+
+        <h2>7. Your Rights</h2>
+        <p>Depending on your location, you may have the right to access, correct, delete, or object to
+        our processing of your personal data, and to withdraw consent at any time (for example, by
+        unsubscribing from our newsletter). To exercise any of these rights, contact us using the
+        details below.</p>
+
+        <h2>8. Cookies</h2>
+        <p>This Site may use essential cookies required for basic functionality. We do not currently use
+        third-party advertising or analytics cookies. If this changes, we will update this policy and,
+        where required, request your consent.</p>
+
+        <h2>9. Children's Privacy</h2>
+        <p>This Site is not directed at children under 16, and we do not knowingly collect personal data
+        from children.</p>
+
+        <h2>10. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. The "Last updated" date at the top of
+        this page reflects the most recent revision.</p>
+
+        <h2>11. Contact Us</h2>
+        <p>If you have questions about this Privacy Policy or how we handle your data, contact us at:</p>
+        <p>
+          Vitakode LLC<br>
+          North Al Ghubra, Bousher, Muscat Governorate, Sultanate of Oman<br>
+          Email: <a href="mailto:info@vitakode.com">info@vitakode.com</a><br>
+          Phone: <a href="tel:+96895990420">+968 9599 0420</a>
+        </p>
+      </div>
+    </div>
+  </section>
+

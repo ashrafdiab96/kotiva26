@@ -1,0 +1,129 @@
+{# Body of pages/cart.twig. Inherited: cart, store, kotiva_catalog. #}
+{% set tax_inclusive = store.settings.tax.taxable_prices_enabled ?? false %}
+{% set sub_excl = tax_inclusive ? cart.sub_total - cart.tax_amount : cart.sub_total %}
+<section data-theme="ritual" class="cart-page" data-kotiva-cart>
+  <div class="container">
+    <header class="cart-head">
+      <p class="t-eyebrow mb-16">Your Selection</p>
+      <h1 class="t-display t-display-md">Cart</h1>
+    </header>
+
+    <salla-conditional-offer data-testid="store-cart-conditional-offer"></salla-conditional-offer>
+
+    {% if not cart.items|length %}
+      <div class="cart-empty" data-testid="store-cart-empty">
+        <p class="cart-empty-line">Your cart is empty.</p>
+        <p class="t-body">Nothing here yet — the full range is a click away.</p>
+        <a class="btn btn-primary" href="{{ theme.settings.get('kotiva_url_shop') }}">Discover the Range</a>
+      </div>
+    {% else %}
+      <div class="cart-layout">
+        <div class="cart-items" role="list">
+          {% hook 'cart:items.start' %}
+          {% for item in cart.items %}
+            {# KOTIVA metadata for the "Category · Size" line, by Salla product id. #}
+            {% set meta = null %}
+            {% for p in kotiva_catalog %}{% if p.salla and p.salla.id == item.product_id %}{% set meta = p %}{% endif %}{% endfor %}
+            <form class="cart-item" role="listitem" id="item-{{ item.id }}" data-testid="store-cart-item-{{ item.id }}" onchange="salla.form.onChange('cart.updateItem', event)">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <a class="cart-item-img" href="{{ item.url }}">
+                <img src="{{ item.product_image }}" alt="{{ item.product_name }}" loading="{{ loop.first ? 'eager' : 'lazy' }}" />
+              </a>
+
+              <div class="cart-item-body">
+                <a class="cart-item-name" href="{{ item.url }}">{{ item.product_name|replace({'Kotiva ': ''}) }}</a>
+                {% if meta %}<div class="cart-item-meta">{{ meta.category }}{% if meta.volume %} &middot; {{ meta.volume }}{% endif %}</div>{% endif %}
+                <div class="cart-item-unit"><span data-cart-item-unit>{{ item.price|money }}</span> <small>excl. VAT</small></div>
+                {% if not item.is_available %}
+                  <p class="cart-item-warn">This product is now sold out.</p>
+                {% endif %}
+                <salla-cart-item-offers quantity="{{ item.quantity }}" item-id="{{ item.id }}" product-price="{{ item.product_price }}" offers="{{ item.detailed_offers|json_encode }}"></salla-cart-item-offers>
+                {% if item.options|length %}
+                  <div class="kotiva-raed cart-item-options">{% include 'pages.partials.product.options' with {product: item} %}</div>
+                {% endif %}
+              </div>
+
+              <div class="cart-item-qty">
+                {% if item.is_hidden_quantity or item.type == 'donating' %}
+                  <input type="hidden" value="{{ item.quantity }}" name="quantity" />
+                  <span>{{ item.quantity }}</span>
+                {% else %}
+                  <label class="visually-hidden" for="qty-{{ item.id }}">Quantity for {{ item.product_name }}</label>
+                  <salla-quantity-input id="qty-{{ item.id }}" class="pdp-qty-select" cart-item-id="{{ item.id }}" max="{{ item.max_quantity }}" value="{{ item.quantity }}" name="quantity" aria-label="Quantity"></salla-quantity-input>
+                {% endif %}
+              </div>
+
+              <div class="cart-item-total" data-cart-item-total>{{ item.is_available ? item.total|money : 'Sold out' }}</div>
+
+              <button class="cart-item-remove" type="button" data-cart-remove="{{ item.id }}" aria-label="Remove {{ item.product_name }} from cart" data-testid="store-cart-delete-item">Remove</button>
+            </form>
+          {% endfor %}
+
+          {% if cart.options|length %}
+            <div class="cart-options kotiva-raed">
+              {% for product_option in cart.options %}
+                <form class="relative" onchange="salla.form.onChange('cart.updateItem', event)" id="item-{{ product_option.id }}">
+                  <input type="hidden" name="id" value="{{ product_option.id }}">
+                  <input type="hidden" name="quantity" value="{{ product_option.quantity }}">
+                  {% include 'pages.partials.product.options' with { product: product_option } %}
+                </form>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <salla-offer data-testid="store-cart-offer"></salla-offer>
+          {% hook 'cart:items.end' %}
+        </div>
+
+        {% hook 'cart:summary.start' %}
+        <aside class="cart-summary" aria-label="Order summary">
+          <h2 class="cart-summary-title">Summary</h2>
+
+          <div class="cart-summary-row">
+            <span>Subtotal <small>excl. VAT</small></span>
+            <span data-cart-subtotal>SAR {{ sub_excl|number_format(2, '.', ',') }}</span>
+          </div>
+
+          <div class="cart-summary-row"{% if not cart.discount %} hidden{% endif %} data-cart-discount-row>
+            <span>Discount</span>
+            <span data-cart-discount>&minus; SAR {{ (cart.discount ?? 0)|number_format(2, '.', ',') }}</span>
+          </div>
+
+          <div class="cart-summary-row">
+            <span>VAT (15%)</span>
+            <span data-cart-vat>SAR {{ (cart.tax_amount ?? 0)|number_format(2, '.', ',') }}</span>
+          </div>
+
+          <div class="cart-summary-row cart-summary-muted">
+            <span>Shipping</span>
+            <span>Calculated at checkout</span>
+          </div>
+
+          <div class="cart-summary-row cart-summary-total">
+            <span>Total <small>incl. VAT</small></span>
+            <span data-cart-total>SAR {{ cart.total|number_format(2, '.', ',') }}</span>
+          </div>
+
+          <p class="cart-summary-note">
+            Product prices are shown excluding VAT. 15% VAT is
+            calculated and included in the total above, and delivery is added at checkout.
+          </p>
+
+          {% if store.settings.cart.apply_coupon_enabled %}
+            {% hook 'cart:coupon.start' %}
+            <salla-cart-coupons data-testid="store-cart-coupons" class="cart-coupons"></salla-cart-coupons>
+            {% hook 'cart:coupon.end' %}
+          {% endif %}
+
+          {% hook 'cart:summary-card.start' %}
+          <salla-button id="cart-submit" class="cart-checkout" data-testid="store-cart-submit" width="wide">Proceed to Checkout</salla-button>
+          <a class="btn btn-outline cart-continue" href="{{ theme.settings.get('kotiva_url_shop') }}">Continue Shopping</a>
+          {% hook 'cart:summary-card.end' %}
+
+          <p class="cart-summary-cod">Cash on delivery available.</p>
+          {% hook 'cart:summary.end' %}
+        </aside>
+      </div>
+      <salla-tiered-offer data-testid="store-cart-tiered-offer"></salla-tiered-offer>
+    {% endif %}
+  </div>
+</section>

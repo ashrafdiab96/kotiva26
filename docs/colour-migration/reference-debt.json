@@ -1,0 +1,145 @@
+{
+  "_note": "Colour literals the palette rules reject that ALREADY exist in the reference site (../website) files this theme ports verbatim. Keyed by normalised colour; count = uses in the reference. Tolerated only in ported files, at most count times per pool (src, public). Recorded by node scripts/validate-palette.mjs --record-reference-debt.",
+  "entries": {
+    "#F4EFEC": {
+      "count": 1,
+      "reason": "base colour #F4EFEC is not in the KOTIVA palette",
+      "files": [
+        "resources/views/pages/home.blade.php"
+      ]
+    },
+    "rgba(0,0,0,0.25)": {
+      "count": 1,
+      "reason": "black is allowed only in retained existing shadows at their audited alpha",
+      "files": [
+        "public/css/kotiva.css"
+      ]
+    },
+    "rgba(138,183,233,0.22)": {
+      "count": 1,
+      "reason": "alpha 0.22 on Cleansing #8AB7E9 is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/shop.css"
+      ]
+    },
+    "rgba(138,183,233,0.4)": {
+      "count": 1,
+      "reason": "alpha 0.4 on Cleansing #8AB7E9 is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/shop.css"
+      ]
+    },
+    "rgba(215,40,47,0.16)": {
+      "count": 1,
+      "reason": "alpha 0.16 on Skin Repair #D7282F is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/shop.css"
+      ]
+    },
+    "rgba(215,40,47,0.45)": {
+      "count": 1,
+      "reason": "alpha 0.45 on Skin Repair #D7282F is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/shop.css"
+      ]
+    },
+    "rgba(236,119,37,0.07)": {
+      "count": 1,
+      "reason": "alpha 0.07 on Sunscreen #EC7725 is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/shop.css"
+      ]
+    },
+    "rgba(236,119,37,0.12)": {
+      "count": 1,
+      "reason": "alpha 0.12 on Sunscreen #EC7725 is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/shop.css"
+      ]
+    },
+    "rgba(255,255,255,0.14)": {
+      "count": 1,
+      "reason": "alpha 0.14 on White #FFFFFF is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/shop.css"
+      ]
+    },
+    "rgba(255,255,255,0.28)": {
+      "count": 2,
+      "reason": "alpha 0.28 on White #FFFFFF is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/shop.css"
+      ]
+    },
+    "rgba(255,255,255,0.45)": {
+      "count": 1,
+      "reason": "alpha 0.45 on White #FFFFFF is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/kotiva.css"
+      ]
+    },
+    "rgba(255,255,255,0.55)": {
+      "count": 1,
+      "reason": "alpha 0.55 on White #FFFFFF is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/kotiva.css"
+      ]
+    },
+    "rgba(255,255,255,0.62)": {
+      "count": 2,
+      "reason": "alpha 0.62 on White #FFFFFF is not an approved combination or audited family alpha",
+      "files": [
+        "resources/views/product/show.blade.php"
+      ]
+    },
+    "rgba(255,255,255,0.7)": {
+      "count": 1,
+      "reason": "alpha 0.7 on White #FFFFFF is not an approved combination or audited family alpha",
+      "files": [
+        "resources/views/pages/home.blade.php"
+      ]
+    },
+    "rgba(255,255,255,0.75)": {
+      "count": 1,
+      "reason": "alpha 0.75 on White #FFFFFF is not an approved combination or audited family alpha",
+      "files": [
+        "resources/views/pages/home.blade.php"
+      ]
+    },
+    "rgba(255,255,255,0.8)": {
+      "count": 1,
+      "reason": "alpha 0.8 on White #FFFFFF is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/kotiva.css"
+      ]
+    },
+    "rgba(35,31,32,0.18)": {
+      "count": 1,
+      "reason": "alpha 0.18 on Logo black #231F20 is not an approved combination or audited family alpha",
+      "files": [
+        "resources/views/pages/home.blade.php"
+      ]
+    },
+    "rgba(35,31,32,0.42)": {
+      "count": 1,
+      "reason": "alpha 0.42 on Logo black #231F20 is not an approved combination or audited family alpha",
+      "files": [
+        "resources/views/pages/home.blade.php"
+      ]
+    },
+    "rgba(35,31,32,0.45)": {
+      "count": 1,
+      "reason": "alpha 0.45 on Logo black #231F20 is not an approved combination or audited family alpha",
+      "files": [
+        "resources/views/pages/home.blade.php"
+      ]
+    },
+    "rgba(35,31,32,0.48)": {
+      "count": 1,
+      "reason": "alpha 0.48 on Logo black #231F20 is not an approved combination or audited family alpha",
+      "files": [
+        "public/css/shop.css"
+      ]
+    }
+  }
+}

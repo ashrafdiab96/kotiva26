@@ -1,0 +1,58 @@
+{#
+  KOTIVA Ingredients — resources/views/pages/ingredients.blade.php ported 1:1 (markup, copy and the page's own
+  styles verbatim; only URLs and asset paths changed). Rendered by pages/page-single.twig.
+  Entries: the reference's IngredientGlossary output, generated into components/kotiva/data.twig
+  (scripts/export-reference-data.mjs); product links are Salla URLs, refreshed live by kotiva-core.js.
+#}
+<style>
+.ig-hero { padding-top: calc(var(--nav-h) + 80px); padding-bottom: 64px; border-bottom: 1px solid var(--border); }
+.ig-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); }
+.ig-card { background: var(--bg); padding: clamp(28px, 3vw, 44px); display: flex; flex-direction: column; gap: 16px; scroll-margin-top: calc(var(--nav-h) + 24px); }
+.ig-card-head { display: flex; flex-direction: column; gap: 10px; }
+.ig-cat { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-deep); }
+.ig-name { font-family: var(--font-display); font-size: clamp(18px, 1.8vw, 24px); font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; color: var(--fg); line-height: 1.15; }
+.ig-also { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; color: var(--fg-dim); margin-top: 4px; text-transform: none; }
+.ig-summary { font-size: 14px; line-height: 1.75; color: var(--fg-mid); font-family: var(--font-body); }
+.ig-found { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+.ig-found-label { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-dim); display: block; margin-bottom: 10px; }
+.ig-found-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.ig-prod { font-family: var(--font-display); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; padding: 5px 12px; border: 1px solid var(--border); color: var(--accent-deep); transition: color 0.2s, border-color 0.2s; }
+.ig-prod:hover { color: var(--accent-text); border-color: var(--bronze); }
+.ig-disclaimer { padding: clamp(32px, 4vw, 56px) 0; border-top: 1px solid var(--border); }
+.ig-disclaimer p { font-size: 12px; line-height: 1.8; color: var(--fg-dim); font-family: var(--font-body); max-width: 720px; }
+@media (max-width: 780px) { .ig-grid { grid-template-columns: 1fr; } }
+</style>
+  <header class="ig-hero">
+    <div class="container">
+      <p class="t-eyebrow" style="margin-bottom:16px;">Know Your Actives</p>
+      <h1 class="t-display" style="margin-bottom:20px;">INGREDIENT<br>GLOSSARY</h1>
+      <p class="t-body" style="max-width:560px;">A plain-language reference to the key active ingredients across the KOTIVA range — what each one is, and what it does for your skin. Every entry links to the products that use it, where the full clinical mechanism and references live.</p>
+    </div>
+  </header>
+
+  <section class="section-pad-sm">
+    <div class="container">
+      <div class="ig-grid">
+{% for entry in kotiva_glossary %}
+  <article class="ig-card" id="{{ entry.slug }}">
+    <div class="ig-card-head">
+      <div class="ig-cat">{{ entry.category }}</div>
+      <h2 class="ig-name">{{ entry.name }}{% if entry.also %}<span class="ig-also">{{ entry.also }}</span>{% endif %}</h2>
+    </div>
+    <p class="ig-summary">{{ entry.summary }}</p>
+    <div class="ig-found">
+      <span class="ig-found-label">Found in</span>
+      <div class="ig-found-list">{% for p in entry.products %}<a class="ig-prod" href="{{ link(kotiva_catalog[p.sku].salla.path|trim('/', 'left')) }}" data-kotiva-sku="{{ p.sku }}">{{ p.name }}</a>{% endfor %}</div>
+    </div>
+  </article>
+{% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="ig-disclaimer">
+    <div class="container">
+      <p>This glossary describes the general function of each active ingredient. It is educational and does not constitute medical advice or a claim to treat, cure, or prevent any condition. Individual formulations, concentrations, and full clinical references are detailed on each product page. Patch-test new products and consult a healthcare professional for concerns specific to your skin.</p>
+    </div>
+  </section>
+

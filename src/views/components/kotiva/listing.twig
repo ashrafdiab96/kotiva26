@@ -1,0 +1,95 @@
+{#
+  KOTIVA collection page — the reference's resources/views/shop/index.blade.php markup, with
+  the Salla customizer's behaviour (ten Salla filter keys, client-side sort, "Load more"
+  15 + 10, empty state, ?routine=).
+
+  Rendered server-side from the generated catalog (components/kotiva/data.twig) so the page
+  paints complete; kotiva-listing.js then reconciles it with the live Salla store: prices,
+  stock, product ids and URLs, any product removed from or added to Salla, and the counts.
+  If the store cannot be reached the server-rendered catalog stays (fails open).
+
+  Inherited from product/index.twig: page, kotiva_listing_mode ('collection' | 'source'),
+  kotiva_catalog, kotiva_glossary, kotiva_bestsellers.
+#}
+{% set collection = kotiva_listing_mode == 'collection' %}
+{% set shop_url = theme.settings.get('kotiva_url_shop') %}
+{% set filters = [['all', 'All'], ['cleanser', 'Cleanser'], ['toner', 'Toner'], ['lip-care', 'Lip Care'], ['spf', 'SPF'], ['body', 'Body'], ['hand-care', 'Hand Care'], ['treatment', 'Treatment'], ['serums', 'Serums'], ['hair', 'Hair']] %}
+{% set sorts = [['featured', 'Featured'], ['price_asc', 'Price: Low to High'], ['price_desc', 'Price: High to Low'], ['name_asc', 'Name: A–Z'], ['newest', 'Newest']] %}
+
+<!-- SHOP HERO — editorial -->
+<section class="shop-hero" data-theme="editorial">
+  <img src="{{ 'kotiva/assets/shop-hero-flatlay-v2.webp'|asset }}" alt="" role="presentation" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+  <div style="position:absolute;inset:0;background:linear-gradient(120deg,rgba(106,50,119,0.86) 0%,rgba(106,50,119,0.70) 45%,rgba(106,50,119,0.46) 100%);"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(106,50,119,0.12) 0%,transparent 55%);"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(to top,rgba(106,50,119,0.6),transparent);"></div>
+  <div class="shop-hero-content" style="position:relative;z-index:2;">
+    <p class="t-eyebrow mb-16">Doctor-Approved Skincare</p>
+    {% if collection %}
+      <h1 class="t-display t-display-lg" style="color:#FFFFFF;">The Collection</h1>
+      <p style="font-family:var(--font-body);font-size:15px;color:#FFFFFF;margin-top:12px;"><span data-kotiva-count>{{ kotiva_catalog|length }}</span> products formulated with clinically proven ingredients</p>
+    {% else %}
+      <h1 class="t-display t-display-lg" style="color:#FFFFFF;">{{ page.title|striptags }}</h1>
+      <p style="font-family:var(--font-body);font-size:15px;color:#FFFFFF;margin-top:12px;"{% if search_query is defined and search_query %} data-kotiva-search="{{ search_query }}"{% endif %}><span data-kotiva-count>&nbsp;</span> products</p>
+    {% endif %}
+  </div>
+</section>
+
+<!-- FILTERS — sticky -->
+<section data-theme="ritual" class="filter-sticky">
+  <div class="container">
+    <div class="shop-controls">
+      {% if collection %}
+      {# No data-target: layout.js's initFilters() then only toggles the pill states, and
+         kotiva-listing.js owns filtering (it must combine filter, sort, routine and Load more). #}
+      <div class="filter-pills" role="group" aria-label="Filter products">
+        {% for f in filters %}
+          <button class="filter-pill{{ f[0] == 'all' ? ' active' : '' }}" data-filter="{{ f[0] }}" data-label="{{ f[1] }}">{{ f[1] }} ({{ kotiva_filter_counts[f[0]] ?? 0 }})</button>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="shop-sort" role="group" aria-label="Sort products">
+        <span class="shop-sort-label">Sort</span>
+        {% for s in sorts %}
+          <a class="filter-pill shop-sort-pill{{ s[0] == 'featured' ? ' active' : '' }}" href="?sort={{ s[0] }}" data-sort="{{ s[0] }}"{% if s[0] == 'featured' %} aria-current="true"{% endif %}>{{ s[1] }}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT GRID — ritual -->
+<section data-theme="ritual" class="section-pad-sm">
+  <div class="container">
+    <div id="product-grid" data-stagger="40" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);"
+         data-kotiva-listing="{{ kotiva_listing_mode }}"
+         data-source="{{ page.slug }}" data-source-value="{{ page.id }}">
+{% if collection %}
+{# Featured first, then catalog order (the catalog is generated in KOT001…KOT025 order) —
+   the customizer's "Featured" sort. #}
+{% for pass in [true, false] %}{% for p in kotiva_catalog %}{% if p.featured == pass %}
+      <div class="product-card" data-tags="{{ p.filter }}" data-sku="{{ p.sku }}" style="border:none;">
+        <a class="product-card-link" href="{{ link(p.salla.path|trim('/', 'left')) }}" data-kotiva-sku="{{ p.sku }}">
+          <div class="product-card-img">
+            <img src="{{ ('kotiva/' ~ p.image)|asset }}" alt="{{ p.displayName }}" loading="lazy" />
+          </div>
+          <div class="product-card-body">
+            <div class="product-card-name">{{ p.displayName }}</div>
+            <div class="product-card-desc">{{ p.category }} · {{ p.skinType }}</div>
+            <div class="product-card-price" data-kotiva-price>SAR&nbsp;<small>excl. VAT</small></div>
+            <div class="product-card-footer"><span class="badge-concern">{{ p.concern }}</span><span class="product-card-cta">Discover</span></div>
+          </div>
+        </a>
+        <div class="product-card-add">
+          <salla-add-product-button class="kotiva-add" product-id="{{ p.salla.id }}" product-status="sale" product-type="product" width="wide" fill="outline">Add to cart</salla-add-product-button>
+        </div>
+      </div>
+{% endif %}{% endfor %}{% endfor %}
+{% endif %}
+    </div>
+    <p class="kotiva-listing-empty t-body" hidden>No products found in this category.</p>
+    <div class="kotiva-load-more">
+      <button type="button" class="btn btn-outline" id="kotiva-load-more" hidden>Load more</button>
+    </div>
+  </div>
+</section>

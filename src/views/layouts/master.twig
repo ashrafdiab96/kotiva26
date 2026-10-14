@@ -1,124 +1,125 @@
-{# ############## Shared Variables in all views ################
-| Variable                                           | Type     | Description                                                                                              |
-|----------------------------------------------------|----------|----------------------------------------------------------------------------------------------------------|
-| store                                              | Store    |                                                                                                          |
-| store.id                                           | int      |                                                                                                          |
-| store.name                                         | string   |                                                                                                          |
-| store.username                                     | string   |                                                                                                          |
-| store.description                                  | string   |                                                                                                          |
-| store.slogan                                       | ?string  | * if feature in twilight.json                                                                            |
-| store.logo                                         | string   |                                                                                                          |
-| store.url                                          | string   |                                                                                                          |
-| store.api                                          | string   | the api url for current store                                                                            |
-| store.icon                                         | string   | *fav icon url                                                                                            |
-| store.contacts                                     | object   | [mobile, phone, email, whatsapp, telegram], ex. store.contacts.email                                     |
-| store.social                                       | object   | [instagram, snapchat, twitter, youtube, facebook, pinterest, maroof, whatsapp], ex. store.social.twitter |
-| store.settings                                     | object   |                                                                                                          |
-| store.settings.auth.email_allowed                  | bool     |                                                                                                          |
-| store.settings.auth.mobile_allowed                 | bool     |                                                                                                          |
-| store.settings.auth.is_email_required              | bool     |                                                                                                          |
-| store.settings.cart.apply_coupon_enabled           | bool     | Does visitor allowed to applay coupon in cart page                                                       |
-| store.settings.product.total_sold_enabled          | bool     |                                                                                                          |
-| store.settings.product.fit_type                    | ?string  | null when equal product card size is off, or ['cover', 'contain']                                        |
-| store.settings.category.testimonial_enabled        | bool     | Show random testimonials in category page                                                                |
-| store.settings.tax.number                          | ?string  |                                                                                                          |
-| store.settings.tax.certificate                     | ?string  | certificate image url                                                                                    |
-| store.settings.tax.taxable_prices_enabled          | bool     | Does tax included in the prices ex product_price 100 & tax is 15, price will be 115                      |
-| store.settings.rating_enabled                      | bool     | Is one of: store_enabled or shipping_enabled or products_enabled                                         |
-| store.settings.arabic_numbers_enabled              | bool     | Does the merchant wants the numbers to be shown as Arabic format                                         |
-| store.settings.is_multilingual                     | bool     |                                                                                                          |
-| store.settings.currencies_enabled                  | bool     |     
-| theme                                              | Theme    |                                                                                                          |
-| theme.id                                           | int      |                                                                                                          |
-| theme.name                                         | string   |                                                                                                          |
-| theme.mode                                         | string   | `live`, `preview`                                                                                        |
-| theme.is_rtl                                       | bool     |                                                                                                          |
-| theme.translations_hash                            | int      | to be used in case merchant updated frontend store translations                                          |
-| theme.color                                        | object   |                                                                                                          |
-| theme.color.primary                                | string   |                                                                                                          |
-| theme.color.text                                   | string   | suitable text color comparing to `theme.primary.color`, #000000, #FFFFFF                                 |
-| theme.color.reverse_primary                        | string   |                                                                                                          |
-| theme.color.reverse_text                           | string   | if `theme.text_color=#000000` means that `theme.reverse_text_color=#FFFFFF`                              |
-| theme.color.is_dark                                | bool     | Does main store color `theme.primary.color` considered as dim color?                                     |
-| theme.color.darker(float alpha, ?string hexColor)  | string   | get darker color from `theme.primary.color` or from passed color, `alpha` range from 0.0-1.0             |
-| theme.color.lighter(float alpha, ?string hexColor) | string   | get lighter color from `theme.primary.color` or from passed color, `alpha` range from 0.0-1.0            |
-| theme.font                                         | ?object  | Salla predefined font, null when the theme doesn't have `fonts` feature                                  |
-| theme.font.name                                    | string   | DINNextLTArabic-Regular, Amazon-Ember, Apple, Dubai, Estedad                                             |
-| theme.font.url                                     | string   | css full url ex: 'https://my_store.test/dist/fonts/default.css'                                          |
-| theme.settings                                     | object   | dynamic object with values of the `settings` in twilight.json ex. `theme.settings.topnav_is_dark`        |
-| theme.settings.set(settingName, value)             | string   | set global var, then get it {{theme.settings.get('my_var','fallback') }}                                 |
-| theme.settings.get(settingName, default=null)      | mixed    | get theme setting ex `theme.settings.get('my_var', 'fallback')`                                          |
+{#
+  KOTIVA layout — a port of the reference site's resources/views/layouts/app.blade.php.
+
+  Kept from Raed: every {% hook %} (head:start, head, head:end, body:start, body:end,
+  body:classes), the Salla modals at the end of <body>, <salla-scopes>, and app.js (Salla's
+  notifier, cart events, modals). Everything else is KOTIVA's own layout and assets.
+
+  Load order matters: Raed's app.css first (Salla components, customer pages), then the
+  verbatim KOTIVA kotiva.css + shop.css, then kotiva-salla.css, which only adapts Salla's
+  components and Raed's leftovers to the KOTIVA design. See docs/DECISIONS.md T-06.
+
+  Shared Twig values are published through theme.settings.set() so that components rendered
+  with {% component %} (header, footer, home sections) can read them — see kotiva/urls.twig.
 #}
+{% include 'components.kotiva.urls' %}
+{% set announcement = theme.settings.get('announcement_enabled') and theme.settings.get('announcement_text')|trim != '' %}
 <!DOCTYPE html>
-<html lang="{{ language.code }}" dir="{{ theme.is_rtl ? 'rtl' : 'ltr' }}">
-<!-- بسم الله الرحمن الرحيم -->
+<html lang="{{ language.code }}" dir="{{ theme.is_rtl ? 'rtl' : 'ltr' }}" data-dir="{{ theme.is_rtl ? 'rtl' : 'ltr' }}" data-theme="ritual"{{ announcement ? ' class="has-announcement"' : '' }}>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {{ theme.settings.set('placeholder', 'images/placeholder.png') }}
 
+    {# Anti-FOUC: the saved light/dark mode is applied before first paint. Same key and rule as
+       layout.js, which repeats it harmlessly once it loads. #}
+    <script data-cfasync="false">(function(){try{if(localStorage.getItem('kotiva-mode')==='dark')document.documentElement.dataset.mode='dark';}catch(e){}})();</script>
+
     <script defer data-cfasync="false" crossorigin="anonymous" src="{{ 'product-card.js'|asset }}"></script>
-    <script defer src="{{ 'main-menu.js'|asset }}"></script>
-    {% if theme.settings.get('enable_add_product_toast', true) %}
-        <script defer src="{{ 'add-product-toast.js'|asset }}"></script>
-    {% endif %}
+    <script defer src="{{ 'add-product-toast.js'|asset }}"></script>
 
     {% block head_scripts %}{% endblock %}
 
-
     <script data-cfasync="false">
-        window.header_is_sticky = "{{theme.settings.get('header_is_sticky', 'Default Value')}}"
-        window.imageZoom = "{{theme.settings.get('imageZoom')}}"
-        window.can_access_wallet = {{ user.can_access_wallet | json_encode }}
-        window.enable_more_menu = "{{ theme.settings.get('enable_more_menu', true) }}"
-        window.enable_add_product_toast = "{{ theme.settings.get('enable_add_product_toast', true) }}"
-        window.notify_when_available_in_card = "{{ theme.settings.get('notify_when_available_in_card', true) }}"
+        {# Raed's app.js and partials read these globals; KOTIVA has its own header, so the
+           sticky Raed menu and the "more" menu are off. #}
+        window.header_is_sticky = false;
+        window.imageZoom = false;
+        window.can_access_wallet = {{ user.can_access_wallet | json_encode }};
+        window.enable_more_menu = false;
+        window.enable_add_product_toast = true;
+        window.notify_when_available_in_card = true;
+        window.KOTIVA_THEME = {
+            {# Probes, not directories: |asset is documented for files. kotiva-core.js strips
+               the file name (and any cache-busting query) to get each base URL. #}
+            assetProbe: {{ 'kotiva/css/kotiva.css'|asset|json_encode|raw }},
+            dataProbe: {{ 'kotiva-theme/data/catalog.json'|asset|json_encode|raw }},
+            storeUrl: {{ store.url|json_encode|raw }},
+            listingUrl: {{ theme.settings.get('kotiva_url_shop')|json_encode|raw }},
+            cartUrl: {{ link('cart')|json_encode|raw }},
+            pages: {
+                about: {{ theme.settings.get('kotiva_url_about')|json_encode|raw }},
+                science: {{ theme.settings.get('kotiva_url_science')|json_encode|raw }},
+                contact: {{ theme.settings.get('kotiva_url_contact')|json_encode|raw }},
+                ingredients: {{ theme.settings.get('kotiva_url_ingredients')|json_encode|raw }},
+                routineFinder: {{ theme.settings.get('kotiva_url_routine_finder')|json_encode|raw }},
+                privacyPolicy: {{ theme.settings.get('kotiva_url_privacy_policy')|json_encode|raw }},
+                terms: {{ theme.settings.get('kotiva_url_terms')|json_encode|raw }},
+                journal: {{ theme.settings.get('kotiva_url_journal')|json_encode|raw }}
+            },
+            storeEmail: {{ (store.contacts.email ?? '')|json_encode|raw }},
+            newsletterEndpoint: {{ (theme.settings.get('newsletter_endpoint') ?? '')|trim|json_encode|raw }},
+            contactEndpoint: {{ (theme.settings.get('contact_endpoint') ?? '')|trim|json_encode|raw }},
+            pageSlug: {{ (page.slug ?? '')|json_encode|raw }}
+        };
     </script>
-    
+
     {% hook 'head:start' %}
     {% hook head %}
+    <link rel="icon" type="image/svg+xml" href="{{ 'kotiva/assets/favicon.svg'|asset }}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ 'kotiva/assets/favicon-48.png'|asset }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ 'kotiva/assets/apple-touch-icon.png'|asset }}">
+    <link rel="preload" href="{{ 'kotiva/fonts/FuturaNowVar-Roman.woff2'|asset }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ 'kotiva/fonts/Montserrat-VariableFont_wght_25.woff2'|asset }}" as="font" type="font/woff2" crossorigin>
     {% block styles %}{% endblock %}
     <link rel="stylesheet" href="{{ 'app.css' | asset }}">
-    <link rel="stylesheet" href="{{ theme.font.path|cdn }}"/>
     <link rel="stylesheet" href="{{ 'fonts/sallaicons.css'|cdn }}"/>
-    
+    {% if theme.font %}<link rel="stylesheet" href="{{ theme.font.path|cdn }}"/>{% endif %}
+    <link rel="stylesheet" href="{{ 'kotiva/css/kotiva.css'|asset }}">
+    <link rel="stylesheet" href="{{ 'kotiva/css/shop.css'|asset }}">
+    <link rel="stylesheet" href="{{ 'kotiva-theme/css/kotiva-salla.css'|asset }}">
     <style>
+        {# Brand blue for every Salla component (buttons, badges, toasts). Deliberately NOT
+           theme.color.primary: the brand colour is fixed by the KOTIVA palette. #}
         :root {
-            --font-main: '{{theme.font.name}}';
-            --color-primary: {{ theme.color.primary }};
-            --color-primary-dark: {{ theme.color.darker(0.15) }};
-            --color-primary-light: {{ theme.color.lighter(0.15) }};
-            --color-primary-reverse: {{ theme.color.reverse_text }};
-            /* Theme specific variables */
-            --s-radius: .75rem;
+            --font-main: 'Montserrat', '{{ theme.font.name ?? 'sans-serif' }}';
+            --color-primary: #005DBA;
+            --color-primary-dark: #005DBA;
+            --color-primary-light: #8AB7E9;
+            --color-primary-reverse: #FFFFFF;
+            --s-radius: 100px;
         }
     </style>
+    {% block page_styles %}{% endblock %}
     {# tracking services, custom css feature. #}
     {% hook 'head:end' %}
 </head>
-<body id="app" class="theme-raed overflow-x-hidden {% hook 'body:classes' %}
-  {{ theme.settings.get('footer_is_dark') ? ' footer-is-dark' : ' footer-is-light' }}
-  {{ theme.settings.get('topnav_is_dark') ? ' topnav-is-dark' : '' }}
-  {{ theme.settings.get('sticky_add_to_cart') ? ' is-sticky-product-bar' : '' }}
-  ">
+<body id="app" class="kotiva {% block body_class %}{% endblock %} {% hook 'body:classes' %}"{% block body_attrs %}{% endblock %}>
 <noscript>
     To get full functionality of this site you need to enable JavaScript. Here is how
-    <a href="https://www.enable-javascript.com/" rel="noreferrer"
-       target="_blank">To enable JavaScript on webpage</a>.
+    <a href="https://www.enable-javascript.com/" rel="noreferrer" target="_blank">To enable JavaScript on webpage</a>.
 </noscript>
-<div class="app-inner flex flex-col min-h-full">
-    {% hook 'body:start' %}
-    {% component 'header.header' %}
-    <main id="main-content" role="main"{{ (page.slug == 'product.single' or page.slug starts with 'product.index') ? ' class="flex flex-col space-y-8 sm:space-y-16"' : '' }}>
-    {% block content %}{% endblock %}
-    </main>
-    {% component 'footer.footer' %}
-</div>
-{% hook 'body:end' %}
-{% if theme.settings.get('enable_add_product_toast', true) %}
-    <salla-add-product-toast data-testid="store-add-product-toast"></salla-add-product-toast>
+<!-- ═══════════════════════════════════════
+     NAVIGATION
+═══════════════════════════════════════ -->
+<a class="skip-link" href="#main-content">Skip to content</a>
+{% hook 'body:start' %}
+{% if announcement %}
+  <div class="kotiva-announce" role="status">
+    <p class="kotiva-announce-text">{{ theme.settings.get('announcement_text') }}</p>
+  </div>
 {% endif %}
+{% component 'header.header' %}
+
+<main id="main-content"{% block main_attrs %}{% endblock %}>
+{% block content %}{% endblock %}
+</main>
+
+{% component 'footer.footer' %}
+
+{% hook 'body:end' %}
+<salla-add-product-toast data-testid="store-add-product-toast"></salla-add-product-toast>
 <script defer crossorigin="anonymous" src="{{ 'app.js' | asset }}"></script>
 
 {# Twilight Components #}
@@ -128,6 +129,11 @@
 {% if store.scope %}
     <salla-scopes data-testid="store-scopes" selection="{{ store.scope.display_as == 'popup' ? 'mandatory' : 'optional' }}"></salla-scopes>
 {% endif %}
+
+{% block pre_scripts %}{% endblock %}
+<script src="{{ 'kotiva/js/layout.js'|asset }}"></script>
+<script src="{{ 'kotiva/js/animations.js'|asset }}"></script>
+<script src="{{ 'kotiva-core.js'|asset }}"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

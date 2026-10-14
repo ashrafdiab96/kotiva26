@@ -1,0 +1,69 @@
+{#
+  KOTIVA home — RITUAL STRIP — editorial.
+  Ported 1:1 from the reference's resources/views/pages/home.blade.php; only URLs and asset
+  paths changed (components/kotiva/urls.twig, |asset).
+#}
+<!-- ═══════════════════════════════════════
+     RITUAL STRIP — editorial
+═══════════════════════════════════════ -->
+<section data-theme="editorial" class="section-pad-sm" aria-label="The Kotiva ritual">
+  <div class="container text-center reveal">
+    <span class="t-script" style="display:block; margin-bottom:12px;">The ritual, daily.</span>
+    <h2 class="t-display t-display-md mb-16" style="color:var(--fg);">The Kotiva Ritual</h2>
+    <!-- K33: this line used to sit BELOW the six images, so the sequence was seen before it was
+         explained — six large unlabelled frames, then the reason for them. Moved above the grid.
+         The words are unchanged and no order is implied, which matters: the absence of a numbered
+         sequence here is a deliberate, evidenced decision (routine-model.json records stepOrder as
+         "dem-inferred" with "ratify": true, so publishing a morning-to-night order would assert
+         something the client has never ratified). Framing the set is not the same as sequencing
+         it — this states WHY the frames are there without claiming what order anything goes in. -->
+    <p class="ritual-lede">Consistency over complexity.</p>
+  </div>
+  <!-- Imagery restored 2026-08-18 (minimal polish pass) using the ONLY provenance-safe
+       imagery this brand owns: the authentic manufacturer product renders. Deliberately NOT
+       a numbered sequence — data/routine-model.json records stepOrder as "dem-inferred" with
+       "ratify": true, so publishing a canonical morning-to-night order would assert something
+       the client has never ratified. That is the same error class as the invented labels this
+       section is recovering from, in a different costume. The three concern labels below are
+       the ones already published on the bestseller cards; nothing new is claimed. -->
+  <!-- K30-C (2026-08-19): the six-image ritual gallery is RESTORED, with newly commissioned
+       imagery instead of the fabricated set K30-B removed. Every frame was generated against
+       40_projects/kotiva/KOTIVA-IMAGE-GENERATION-MASTER-2026-08-18.md and passed that package's
+       acceptance checks AT FULL RESOLUTION — the step K30-A skipped. Specifically: the five
+       unbranded frames were swept at 100% and carry no readable text, no invented label, no
+       certification mark and no numeric claim; ritual-01 is the real KOT005 toner, compared
+       side-by-side against its master (silhouette, cap, arc-cut label panel, wordmark, every
+       label block). Still deliberately NOT a numbered sequence — data/routine-model.json records
+       stepOrder as "dem-inferred" with "ratify": true, so no order is implied. The interim
+       3-product shelf (the K30-B fallback) is retired; its routine-finder CTA is kept. -->
+  <div class="container">
+    <div class="ritual-grid reveal" role="list" data-stagger="70">
+      <div class="ritual-tile" role="listitem"><img src="{{ 'kotiva/assets/ritual/ritual-01-v2.webp'|asset }}" alt="A Kotiva Glow Up Water Essence Toner bottle on warm stone in late-afternoon light" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ 'kotiva/assets/ritual/ritual-02-v2.webp'|asset }}" alt="Two unmarked skincare vessels beside a glass prism casting a band of refracted light" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ 'kotiva/assets/ritual/ritual-03-v2.webp'|asset }}" alt="A group of unmarked skincare vessels resting on rumpled linen" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ 'kotiva/assets/ritual/ritual-04-v2.webp'|asset }}" alt="Water droplets beaded on warm stone, backlit to a golden glow" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ 'kotiva/assets/ritual/ritual-05-v2.webp'|asset }}" alt="An unmarked skincare bottle beside plain glass labware on pale stone" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ 'kotiva/assets/ritual/ritual-06-v2.webp'|asset }}" alt="A single dried rosehip and its leaves on sunlit stone" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+    </div>
+    <p class="ritual-foot"><a href="{{ theme.settings.get('kotiva_url_routine_finder') }}">Build your routine →</a></p>
+  </div>
+  <!-- K30-B (2026-08-18, SAME DAY as K30-A, and this correction matters more than the fix it
+       replaces). K30-A swapped this strip to img/journal/*.webp on the finding that those six
+       images were referenced by nothing. That was true and it was not sufficient: NOBODY OPENED
+       THEM AT FULL RESOLUTION. Four of the six carry invented product text — journal-01 renders a
+       bottle labelled "NIACINAMIDE 15% BRIGHTENING SERUM" with a "CLINICALLY TESTED / DOCTOR
+       APPROVED" badge and capsules misspelt "NIACIIAMIDE"; journal-02 an SPF regulatory-style
+       UVA/UVB mark; journal-03 a burned-in caption band with a MOON over "DAYTIME SPF",
+       contradicting KOTIVA's own SPF-morning rule that the routine engine enforces; journal-05 a
+       notebook of formulation percentages and pH. KOTIVA HAS NO 15% NIACINAMIDE PRODUCT — "15%"
+       appears zero times in data-lite.js and data-full.js. That is a fabricated product making a
+       fabricated certification claim on a doctor-positioned brand in a regulated category: the
+       same class as K27 (fabricated testimonials) and K34 (fabricated FAQ products), and a direct
+       breach of DEM's own house rule for this brand's imagery — image-prompts-cycle3-2026-07-20.md
+       line 79: "HARD RULE - no invented text or branding. Never render any readable text, logo,
+       brand name, product label, certification badge or packaging copy anywhere in the frame."
+       The grid is REMOVED rather than re-sourced. K30-B was already the sanctioned fallback, it
+       needs no new photography, and it fixes the original duplication defect as well. The section
+       keeps its copy and its CTA. -->
+
+</section>

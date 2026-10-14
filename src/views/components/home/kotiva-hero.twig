@@ -1,0 +1,111 @@
+{#
+  KOTIVA home — HERO — campaign banner slider.
+  Ported 1:1 from the reference's resources/views/pages/home.blade.php; only URLs and asset
+  paths changed (components/kotiva/urls.twig, |asset).
+  Campaign artwork comes from Theme settings (hero_1_desktop … hero_2_mobile), falling back to
+  the original files. The section's own <style> block is the reference's @push('styles').
+#}
+{% set hero = {
+  d1: theme.settings.get('hero_1_desktop') ?: 'kotiva/img/hero/1.jpeg'|asset,
+  m1: theme.settings.get('hero_1_mobile') ?: 'kotiva/img/hero/3.jpeg'|asset,
+  d2: theme.settings.get('hero_2_desktop') ?: 'kotiva/img/hero/2.jpeg'|asset,
+  m2: theme.settings.get('hero_2_mobile') ?: 'kotiva/img/hero/4.jpeg'|asset
+} %}
+<style>
+/* Campaign banner hero — the artwork carries its own logo, headline and CTA, so the frame is
+   never cropped: each slide keeps its source aspect ratio (16:9 desktop, 2:3 mobile). It sits
+   under the transparent nav; the ::after scrim keeps the white nav legible over light artwork. */
+.hero-banner{ position:relative; background:#F4EFEC; overflow:hidden; aspect-ratio:5461/3072; }
+.hero-banner::after{ content:''; position:absolute; top:0; left:0; right:0; height:calc(var(--nav-h) + 48px); z-index:1; pointer-events:none; background:linear-gradient(to bottom, rgba(35,31,32,.42) 0%, rgba(35,31,32,.18) 55%, transparent 100%); }
+.hero-banner-slide{ position:absolute; inset:0; display:block; opacity:0; visibility:hidden; transition:opacity .8s ease, visibility 0s linear .8s; }
+.hero-banner-slide.is-active{ opacity:1; visibility:visible; transition:opacity .8s ease, visibility 0s; }
+.hero-banner-slide picture, .hero-banner-slide img{ display:block; width:100%; height:100%; }
+.hero-banner-slide img{ object-fit:cover; }
+.hero-banner-dots{ position:absolute; left:50%; bottom:clamp(12px,2vw,24px); transform:translateX(-50%); z-index:2; display:flex; gap:10px; }
+.hero-banner-dot{ width:10px; height:10px; padding:0; border-radius:50%; border:1px solid rgba(35,31,32,.45); background:rgba(255,255,255,.7); cursor:pointer; transition:background .3s ease, width .3s ease; }
+.hero-banner-dot.is-active{ width:28px; border-radius:5px; background:#231F20; border-color:#231F20; }
+.hero-banner-dot:focus-visible{ outline:2px solid #231F20; outline-offset:3px; }
+.hero-banner-arrow{ position:absolute; top:50%; transform:translateY(-50%); z-index:2; display:flex; align-items:center; justify-content:center; width:clamp(36px,3.5vw,52px); height:clamp(36px,3.5vw,52px); padding:0; border-radius:50%; border:1px solid rgba(35,31,32,.2); background:rgba(255,255,255,.75); color:#231F20; cursor:pointer; backdrop-filter:blur(4px); transition:background .3s ease, transform .3s ease; }
+.hero-banner-arrow:hover{ background:#fff; transform:translateY(-50%) scale(1.06); }
+.hero-banner-arrow:focus-visible{ outline:2px solid #231F20; outline-offset:3px; }
+.hero-banner-arrow svg{ width:45%; height:45%; }
+.hero-banner-prev{ left:clamp(10px,2vw,32px); }
+.hero-banner-next{ right:clamp(10px,2vw,32px); }
+.hero-banner-title{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media (max-width:767px){
+  .hero-banner{ aspect-ratio:2048/3072; }
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-banner-slide, .hero-banner-slide.is-active{ transition:none; }
+}
+</style>
+<!-- ═══════════════════════════════════════
+     HERO — campaign banner slider
+═══════════════════════════════════════ -->
+<section class="hero-banner" aria-roledescription="carousel" aria-label="Kotiva campaigns">
+  <h1 class="hero-banner-title">kotiva™ — Doctor-Approved Skincare</h1>
+  <a class="hero-banner-slide is-active" href="{{ theme.settings.get('kotiva_url_shop') }}" aria-roledescription="slide" aria-label="1 of 2: 25+ formulas, each built around one job — shop the range">
+    <picture>
+      <source media="(max-width: 767px)" srcset="{{ hero.m1 }}" width="2048" height="3072" />
+      <img src="{{ hero.d1 }}" width="5461" height="3072" alt="25+ formulas, each built around one job. Doctor-approved skincare for stress-free routines — three women holding kotiva products." fetchpriority="high" />
+    </picture>
+  </a>
+  <a class="hero-banner-slide" href="{{ theme.settings.get('kotiva_url_routine_finder') }}" aria-roledescription="slide" aria-label="2 of 2: Right-sized for your routine — build your kit in 7 questions" aria-hidden="true" tabindex="-1">
+    <picture>
+      <source media="(max-width: 767px)" srcset="{{ hero.m2 }}" width="2048" height="3072" />
+      <img src="{{ hero.d2 }}" width="5461" height="3072" alt="Right-sized for your routine. Build your customized routine kit in 7 questions — a basket of kotiva products." loading="lazy" />
+    </picture>
+  </a>
+  <button type="button" class="hero-banner-arrow hero-banner-prev" aria-label="Previous slide">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button type="button" class="hero-banner-arrow hero-banner-next" aria-label="Next slide">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+  <div class="hero-banner-dots" role="group" aria-label="Choose slide">
+    <button type="button" class="hero-banner-dot is-active" aria-label="Show slide 1" aria-current="true"></button>
+    <button type="button" class="hero-banner-dot" aria-label="Show slide 2"></button>
+  </div>
+</section>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var slides = root.querySelectorAll('.hero-banner-slide');
+  var dots = root.querySelectorAll('.hero-banner-dot');
+  var current = 0, timer = null, INTERVAL = 5000;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function show(i) {
+    current = (i + slides.length) % slides.length;
+    slides.forEach(function (s, n) {
+      var on = n === current;
+      s.classList.toggle('is-active', on);
+      s.setAttribute('aria-hidden', on ? 'false' : 'true');
+      s.tabIndex = on ? 0 : -1;
+    });
+    dots.forEach(function (d, n) {
+      d.classList.toggle('is-active', n === current);
+      if (n === current) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+    });
+  }
+  function start() { if (!reduce && !timer) timer = setInterval(function () { show(current + 1); }, INTERVAL); }
+  function stop() { clearInterval(timer); timer = null; }
+
+  function go(i) { stop(); show(i); start(); }
+  dots.forEach(function (d, n) { d.addEventListener('click', function () { go(n); }); });
+  root.querySelector('.hero-banner-prev').addEventListener('click', function () { go(current - 1); });
+  root.querySelector('.hero-banner-next').addEventListener('click', function () { go(current + 1); });
+
+  /* Swipe on touch devices */
+  var x0 = null;
+  root.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  root.addEventListener('touchend', function (e) {
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) > 40) go(current + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+
+  start();
+})();
+</script>

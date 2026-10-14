@@ -1,7 +1,18 @@
 module.exports = {
     important: false,
+    /* Only the Raed views that survive the KOTIVA port (customer area, loyalty, brands,
+       testimonials, product-option partials, thank-you) and Raed's JS. KOTIVA markup is
+       deliberately NOT scanned: Tailwind would otherwise emit utilities for KOTIVA class
+       names (container, hidden, mt-16, …) that the reference site never had, shifting its
+       layout. See docs/DECISIONS.md T-06 and scripts/check-class-collisions.mjs. */
     content: [
-        "src/views/**/*.twig",
+        "src/views/layouts/customer.twig",
+        "src/views/pages/customer/**/*.twig",
+        "src/views/pages/loyalty.twig",
+        "src/views/pages/brands/**/*.twig",
+        "src/views/pages/testimonials.twig",
+        "src/views/pages/partials/**/*.twig",
+        "src/views/pages/thank-you.twig",
         "src/assets/js/**/*.js",
     ],
     darkMode: 'class', // or 'media' or 'class'
@@ -135,9 +146,12 @@ module.exports = {
     },
     corePlugins: {
       outline: false,
+      // Scoped to Raed's own pages instead: src/assets/styles/02-generic/_raed-preflight.scss
+      preflight: false,
     },
     plugins: [
-      require('@tailwindcss/forms'),
+      // 'class' strategy: no global input styling on KOTIVA forms (Raed inputs use .form-input).
+      require('@tailwindcss/forms')({ strategy: 'class' }),
       require('@tailwindcss/line-clamp'),
     ],
 }

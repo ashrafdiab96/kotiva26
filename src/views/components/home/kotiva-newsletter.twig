@@ -1,0 +1,48 @@
+{#
+  KOTIVA home — NEWSLETTER — ritual.
+  Ported 1:1 from the reference's resources/views/pages/home.blade.php; only URLs and asset
+  paths changed (components/kotiva/urls.twig, |asset).
+  The form calls kotivaSubmitToInbox(), which kotiva-core.js points at the configured
+  newsletter endpoint (Theme settings) — see docs/DECISIONS.md T-07.
+#}
+<!-- ═══════════════════════════════════════
+     NEWSLETTER — ritual
+═══════════════════════════════════════ -->
+<section data-theme="ritual" class="section-pad" id="newsletter" aria-label="Newsletter">
+  <div class="container text-center">
+    <div class="reveal" style="max-width:560px;margin:0 auto;">
+      <p class="t-eyebrow mb-16">Stay Informed</p>
+      <h2 class="t-display t-display-md mb-24">Skin insights,<br/>delivered.</h2>
+      <p class="t-body" style="text-align:center;margin-bottom:0;">Ingredient breakdowns, routine guides, and clinical updates — no filler. Unsubscribe anytime.</p>
+      <form class="newsletter-form" id="home-nl-form" onsubmit="handleHomeNL(event)" role="form" aria-label="Newsletter signup">
+        <input class="newsletter-input" id="home-nl-email" type="email" placeholder="Your email address" aria-label="Email address" required />
+        <button class="btn btn-gold" type="submit">Subscribe</button>
+      </form>
+      <p id="home-nl-status" role="status" aria-live="polite" style="margin-top:12px; font-size:13px; color:var(--fg-mid); display:none;"></p>
+    </div>
+  </div>
+</section>
+
+<script>
+function handleHomeNL(e) {
+  e.preventDefault();
+  const input = document.getElementById('home-nl-email');
+  const btn = e.target.querySelector('button[type="submit"]');
+  const status = document.getElementById('home-nl-status');
+  if (!input.value || !input.value.includes('@')) return;
+  const originalText = btn.textContent;
+  btn.textContent = 'Subscribing…';
+  btn.disabled = true;
+  kotivaSubmitToInbox({ type: 'newsletter', email: input.value }).then(() => {
+    status.textContent = "You're subscribed. Welcome to the standard.";
+    status.style.display = 'block';
+    input.disabled = true;
+    btn.textContent = 'Subscribed ✓';
+  }).catch(() => {
+    status.textContent = 'Something went wrong — please try again or email info@vitakode.com.';
+    status.style.display = 'block';
+    btn.textContent = originalText;
+    btn.disabled = false;
+  });
+}
+</script>

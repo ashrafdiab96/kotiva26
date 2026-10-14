@@ -1,0 +1,501 @@
+{#
+  KOTIVA About — resources/views/pages/about.blade.php ported 1:1 (markup, copy and the page's own
+  styles verbatim; only URLs and asset paths changed). Rendered by pages/page-single.twig.
+#}
+<style>
+.about-hero {
+  padding-top: calc(var(--nav-h) + 80px);
+  padding-bottom: 0;
+  position: relative;
+  overflow: hidden;
+}
+.about-hero-inner {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: clamp(40px, 6vw, 100px);
+  align-items: end;
+  padding-bottom: 80px;
+  border-bottom: 1px solid var(--border);
+}
+.about-hero-visual {
+  position: relative;
+  background: #231F20;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.about-hero-k {
+  font-family: var(--font-logo);
+  font-size: clamp(240px, 30vw, 500px);
+  font-weight: 900;
+  color: rgba(255,255,255,0.04);
+  line-height: 1;
+  user-select: none;
+}
+.about-hero-quote {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(35,31,32,0.9) 60%, transparent);
+  padding: 40px 40px 36px;
+}
+.about-quote-text {
+  font-family: var(--font-script);
+  font-size: clamp(20px, 2.2vw, 34px);
+  color: var(--off-white);
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+.about-quote-attr {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent); /* K34: the light-theme --accent-deep is too dark for 9px text on this near-black
+     hero ground (needs 4.5). --accent-deep is the SMALL-TEXT token for LIGHT surfaces; on a dark
+     surface the relationship inverts and the light accent (#8AB7E9) is the accessible one. */
+}
+/* STATS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+}
+.stat-block {
+  background: var(--black);
+  padding: 36px 28px;
+  text-align: center;
+}
+.stat-number {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4vw, 60px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--off-white);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  /* K12: this block sits on a dark ground but is NOT theme-scoped, so --accent-deep resolved to
+     the LIGHT theme's value, too dark here. --accent-light (#8AB7E9) is the dark-ground accent. */
+  color: var(--accent-light);
+}
+/* MANIFESTO */
+.manifesto-section {
+  padding: var(--gap-section) 0;
+  border-bottom: 1px solid var(--border);
+}
+.manifesto-inner {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: clamp(40px, 6vw, 100px);
+  align-items: start;
+}
+.manifesto-sticky {
+  position: sticky;
+  top: calc(var(--nav-h) + 40px);
+}
+.manifesto-body p {
+  font-size: clamp(15px, 1.3vw, 19px);
+  line-height: 1.9;
+  color: var(--fg-mid);
+  margin-bottom: 24px;
+  font-family: var(--font-body);
+}
+.manifesto-body p:first-child {
+  font-size: clamp(17px, 1.6vw, 23px);
+  color: var(--fg);
+  font-weight: 400;
+  line-height: 1.75;
+}
+.manifesto-body strong { color: var(--fg); }
+/* VALUES */
+.values-section {
+  padding: var(--gap-section) 0;
+  background: var(--bg-alt);
+  color: var(--fg);
+}
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.value-card {
+  background: linear-gradient(var(--bg-card), var(--bg-card)), var(--bg); /* translucent card over the ground, not over the grid separator */
+  padding: clamp(32px, 4vw, 56px) clamp(24px, 3vw, 40px);
+}
+/* K34: .value-num removed. It numbered a SIX-item values grid 01-06 — but the values
+   (Science-Backed Innovation, Trust & Credibility, Professional Expertise, Everyday Care,
+   Safety, Efficacy) are not a sequence, so the numerals asserted a rank the content does not
+   have. Same reasoning that retired the 01-06 numerals on the Best Sellers rail. This page
+   also runs TWO genuine 01-04 sequences (Our Journey, The Framework); a third, unordered run
+   made those read as decoration too. Contrast was fine (verified 4.6:1) — this is semantics. */
+.value-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin-bottom: 14px;
+}
+.value-desc {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg-mid);
+  font-family: var(--font-body);
+}
+/* THE STANDARD SECTION */
+.standard-section {
+  padding: var(--gap-section) 0;
+  border-bottom: 1px solid var(--border);
+}
+.standard-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+}
+.standard-panel {
+  background: var(--black);
+  padding: clamp(40px, 5vw, 72px);
+}
+.standard-panel.highlight { background: var(--bg); }
+/* DOCTOR APPROVED */
+.doctor-section {
+  background: var(--bg);
+  padding: var(--gap-section) 0;
+}
+.doctor-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 6vw, 100px);
+  align-items: center;
+}
+.doctor-badge-large {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--black);
+  aspect-ratio: 1;
+  max-width: 400px;
+  gap: 16px;
+  padding: 60px;
+}
+.doctor-badge-icon {
+  font-size: 48px;
+  /* K34: this had NO color declaration, so the glyph inherited the page's dark --fg and
+     rendered near-black on .doctor-badge-large's near-black ground — measured 1.00:1, i.e.
+     completely invisible, while still occupying 23x82px. Its two siblings (.doctor-badge-title,
+     .doctor-badge-sub) were each given an explicit light colour for this dark surface; only the
+     icon was missed. Contrast checkers that sample text rarely flag a lone glyph, and a missing
+     colour looks like nothing at all in review rather than like a mistake. */
+  color: var(--accent);
+}
+.doctor-badge-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--off-white);
+}
+.doctor-badge-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.64); /* K12: dim text on the #231F20 ground (docs/COLOUR-MIGRATION.md) */
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+/* CTA STRIP */
+.about-cta-strip {
+  background: var(--bronze);
+  color: var(--black); /* the strip keeps the light accent in both modes, so its text is ink in both modes */
+  padding: 48px 0;
+}
+.about-cta-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.about-cta-text {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2vw, 28px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--black);
+}
+@media (max-width: 900px) {
+  .about-hero-inner { grid-template-columns: 1fr; }
+  .manifesto-inner { grid-template-columns: 1fr; gap: clamp(32px, 5vw, 56px); }
+  .manifesto-sticky { position: static; }
+  .values-grid { grid-template-columns: repeat(2, 1fr); }
+  .standard-inner { grid-template-columns: 1fr; }
+  .doctor-inner { grid-template-columns: 1fr; }
+  .doctor-badge-large { max-width: 100%; aspect-ratio: auto; padding: 48px; }
+  .about-cta-inner { flex-direction: column; align-items: flex-start; gap: 24px; }
+}
+@media (max-width: 600px) {
+  .stats-row { grid-template-columns: repeat(3, 1fr); }
+  .manifesto-body p { font-size: 15px; }
+  .manifesto-body p:first-child { font-size: 16px; }
+}
+@media (max-width: 500px) {
+  .values-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr; }
+}
+</style>
+  <!-- HERO -->
+  <header class="about-hero">
+    <div class="container">
+      <div class="about-hero-inner">
+        <div class="about-hero-visual reveal-fade">
+          <img src="{{ 'kotiva/assets/about-hero-portrait-v2.webp'|asset }}" alt="Portrait of a woman with radiant, healthy skin in warm editorial light" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+          <div class="grain-overlay"></div>
+          <div class="about-hero-quote">
+            <div class="about-quote-text">"Skin that performs.<br>A life in motion."</div>
+            <div class="about-quote-attr">— The Kotiva Standard</div>
+          </div>
+        </div>
+        <div>
+          <p class="t-eyebrow reveal" style="margin-bottom:20px;">Our Story</p>
+          <h1 class="t-display reveal reveal-delay-1" style="margin-bottom:28px;">THE<br>KOTIVA<br>STANDARD</h1>
+          <p class="t-script reveal reveal-delay-2" style="margin-bottom:28px;">Doctor approved skincare tailored for you.</p>
+          <p class="t-body reveal reveal-delay-3" style="margin-bottom:40px;">Kotiva was built on a single conviction: that everyone deserves skincare that actually works. Clinical performance. Elegant design. Real, visible results.</p>
+          <a href="{{ theme.settings.get('kotiva_url_shop') }}" class="btn btn-primary reveal reveal-delay-4">Explore the Range</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-block reveal">
+        <div class="stat-number">25</div>
+        <div class="stat-label">Precision Formulations</div>
+      </div>
+      <div class="stat-block reveal reveal-delay-2">
+        <div class="stat-number">EU</div>
+        <div class="stat-label">GMP Manufactured</div>
+      </div>
+      <div class="stat-block reveal reveal-delay-3">
+        <div class="stat-number">5+</div>
+        <div class="stat-label">Skin Type Solutions</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- BRAND MANIFESTO -->
+  <section class="manifesto-section" id="standard">
+    <div class="container">
+      <div class="manifesto-inner">
+        <div class="manifesto-sticky reveal">
+          <p class="t-eyebrow" style="margin-bottom:20px;">The Manifesto</p>
+          <h2 class="t-headline">THE SCIENCE<br>OF DAILY<br>RITUAL</h2>
+          <span class="t-script" style="font-size:clamp(20px,2vw,32px); margin-top:20px; display:block;">The Ripple Effect</span>
+        </div>
+        <div class="manifesto-body reveal reveal-delay-2">
+          <p><strong>Kotiva was built on a simple conviction:</strong> that everyone deserves skincare that actually works. Not marketing promises. Not one-size-fits-all formulas. Real, doctor-validated products with active ingredients that target real skin concerns.</p>
+          <p>The name <strong>kotiva™</strong> is inspired by "quotidian" — meaning daily. It reflects our belief that healthy skin is built through consistent everyday care, not occasional treatments. Simplifying the spelling into kotiva made the name more approachable, memorable, and easy to recognise across global markets, while staying true to its purpose: making professional, science-backed skincare an effortless part of your daily routine.</p>
+          <p>The brand name <strong>kotiva™</strong> evokes vitality, motion, and activation — a life in motion, skin that performs. Every product in the Kotiva range carries the promise of clinical thinking applied to daily ritual.</p>
+          <p>We believe in what we call <strong>The Ripple Effect</strong> — the beauty of daily consistency. One good decision, every morning and every evening, creating visible transformation over time. This is not about overnight promises. This is about building a standard.</p>
+          <p>Our formulations are segmented precisely. Oily skin has different needs than dry skin. Sensitive skin requires a different approach than acne-prone. Every Kotiva product is built for a specific skin reality — not a theoretical average.</p>
+          <p>This is <strong>The Kotiva Standard</strong>: science without compromise, beauty without pretense, performance without promises we can't keep.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section class="values-section">
+    <div class="container">
+      <div class="reveal">
+        <p class="t-eyebrow" style="margin-bottom:16px; color:var(--taupe);">What We Stand For</p>
+        <h2 class="t-headline">OUR CORE<br>VALUES</h2>
+      </div>
+      <div class="values-grid">
+        <div class="value-card reveal">
+          <div class="value-title">Science-Backed Innovation</div>
+          <div class="value-desc">Every product is developed using evidence-based medicine and clinically proven active ingredients to ensure safe, effective, measurable results.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-1">
+          <div class="value-title">Trust &amp; Credibility</div>
+          <div class="value-desc">Building confidence among consumers and healthcare professionals through transparent formulations, quality standards, and reliable performance.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-2">
+          <div class="value-title">Professional Expertise</div>
+          <div class="value-desc">Inspired by dermatological knowledge and medical best practice to deliver professional-grade skincare that addresses real skin concerns.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-3">
+          <div class="value-title">Everyday Care</div>
+          <div class="value-desc">Empowering consistent skincare habits with products that integrate effortlessly into daily routines for long-term skin health.</div>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-title">Safety</div>
+          <div class="value-desc">Prioritising skin health by selecting ingredients with established safety profiles, formulated for everyday use on every skin type.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-1">
+          <div class="value-title">Efficacy</div>
+          <div class="value-desc">Delivering visible, long-lasting results through carefully formulated products backed by scientific research — not marketing trends.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISION & MISSION -->
+  <section class="standard-section" id="vision-mission">
+    <div class="container">
+      <div class="reveal" style="margin-bottom: clamp(40px,5vw,72px);">
+        <p class="t-eyebrow" style="margin-bottom:16px;">Vision &amp; Mission</p>
+        <h2 class="t-headline">WHERE WE'RE<br>HEADED</h2>
+      </div>
+      <div class="standard-inner" data-theme="editorial">
+        <div class="standard-panel">
+          <p class="t-eyebrow" style="margin-bottom:16px;">Vision</p>
+          <h3 class="t-title" style="margin-bottom:20px;">A TRUSTED PART OF YOUR ROUTINE</h3>
+          <p class="t-body">Kotiva is committed to bridging the gap between professional dermatological care and everyday skincare by making clinically inspired, science-backed solutions accessible to everyone. Our vision is to become a trusted part of consumers' daily skincare routines — offering products that integrate seamlessly into their lifestyles while delivering safe, effective, and visible results. By combining evidence-based formulations with proven active ingredients, kotiva brings professional-grade skincare within reach, empowering individuals to achieve healthier skin with confidence every day.</p>
+        </div>
+        <div class="standard-panel highlight">
+          <p class="t-eyebrow" style="margin-bottom:16px;">Mission</p>
+          <h3 class="t-title" style="margin-bottom:20px;">SKIN WELLBEING FOR ALL</h3>
+          <p class="t-body">To empower individuals building healthy, radiant skin through science-backed skincare solutions that fit seamlessly into daily routines — fostering confidence, education, and healthy skin wellbeing for all skin types.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR WHOM -->
+  <section class="manifesto-section" id="for-whom">
+    <div class="container">
+      <div class="manifesto-inner">
+        <div class="manifesto-sticky reveal">
+          <p class="t-eyebrow" style="margin-bottom:20px;">For Every Stage of Life</p>
+          <h2 class="t-headline">FOR EVERYONE.<br>FOR LIFE.</h2>
+        </div>
+        <div class="manifesto-body reveal reveal-delay-2">
+          <p><strong>Kotiva is committed to providing science-backed skincare solutions for every stage of life.</strong> From teenagers managing acne and oily skin, to adults seeking hydration, skin barrier support, pigmentation correction, and anti-aging care, to mature skin requiring intensive nourishment and rejuvenation — kotiva offers targeted solutions for a wide range of skincare needs.</p>
+          <p>Developed with clinically proven active ingredients and guided by evidence-based medicine, our products are designed to support healthy skin across all age groups, making professional skincare accessible, effective, and trusted for everyone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOURNEY & EXPANSION -->
+  <section class="standard-section" id="journey">
+    <div class="container">
+      <div class="reveal" style="margin-bottom: clamp(40px,5vw,72px);">
+        <p class="t-eyebrow" style="margin-bottom:16px;">Our Journey</p>
+        <h2 class="t-headline">MANUFACTURED IN<br>POLAND. GOING GLOBAL.</h2>
+        <p class="t-body" style="max-width:640px; margin-top:20px;">Kotiva products are developed and manufactured in Poland — one of the European Union's most respected manufacturing environments — using high-quality European raw materials and in full compliance with stringent EU regulations and Good Manufacturing Practices (GMP). Poland's reputation for scientific research, pharmaceutical expertise, and rigorous quality control makes it a trusted hub for the production of high-quality skincare. Our expansion strategy is driven by a long-term vision of becoming a globally trusted skincare brand rooted in this European quality and scientific excellence.</p>
+        <a href="{{ 'kotiva/assets/kotiva-company-profile.pdf'|asset }}" target="_blank" rel="noopener" class="btn btn-outline-dark" style="margin-top:28px;">Download Company Profile (PDF)</a>
+      </div>
+      <!-- K30-C: #journey was text-only. Campaign frame 19 — same protagonist as the hero,
+           unbranded bottle, no readable text on anything in frame. -->
+      <figure class="reveal" style="margin:0 0 clamp(40px,5vw,64px);">
+        <img src="{{ 'kotiva/assets/about-journey.webp'|asset }}" alt="A woman working quietly at a sunlit wooden desk, an unmarked skincare bottle beside her" loading="lazy" width="1536" height="1024" style="display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:var(--radius-md,8px);" />
+      </figure>
+      <div class="standard-inner" data-theme="editorial">
+        <div class="standard-panel">
+          <p class="t-eyebrow" style="margin-bottom:16px;">01 — Starting Point</p>
+          <h3 class="t-title" style="margin-bottom:20px;">MANUFACTURED IN POLAND</h3>
+          <p class="t-body">Our journey begins in Poland, where every kotiva product is developed and manufactured to the highest European Union standards — EU GMP-certified, quality-controlled, and built on advanced scientific research.</p>
+        </div>
+        <div class="standard-panel highlight">
+          <p class="t-eyebrow" style="margin-bottom:16px;">02 — Gateway to the GCC</p>
+          <h3 class="t-title" style="margin-bottom:20px;">EXPANDING TO SAUDI ARABIA</h3>
+          <p class="t-body">Saudi Arabia is our strategic gateway to the GCC — launching through partnerships with major pharmacy chains, leading polyclinics, and healthcare professionals across the Kingdom.</p>
+        </div>
+        <div class="standard-panel highlight">
+          <p class="t-eyebrow" style="margin-bottom:16px;">03 — Regional Growth</p>
+          <h3 class="t-title" style="margin-bottom:20px;">COVERING THE GCC</h3>
+          <p class="t-body">Over the next two years, we aim to establish a strong presence across all Gulf Cooperation Council countries through strategic partnerships and an expanding healthcare network.</p>
+        </div>
+        <div class="standard-panel">
+          <p class="t-eyebrow" style="margin-bottom:16px;">04 — Long-Term Vision</p>
+          <h3 class="t-title" style="margin-bottom:20px;">MIDDLE EAST &amp; BEYOND</h3>
+          <p class="t-body">Building on regional success, kotiva will continue its growth throughout the Middle East, with a long-term vision of expanding into international markets, including Europe — bringing evidence-based, professional skincare to consumers worldwide.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE KOTIVA STANDARD -->
+  <section class="standard-section" id="kotiva-standard">
+    <div class="container">
+      <div class="reveal" style="margin-bottom: clamp(40px,5vw,72px);">
+        <p class="t-eyebrow" style="margin-bottom:16px;">The Framework</p>
+        <h2 class="t-headline">WHAT MAKES<br>THE STANDARD</h2>
+      </div>
+      <div class="standard-inner" data-theme="editorial">
+        <div class="standard-panel">
+          <p class="t-eyebrow" style="margin-bottom:16px;">01 — Formulation</p>
+          <h3 class="t-title" style="margin-bottom:20px;">INGREDIENT-LED</h3>
+          <p class="t-body">Every product in the Kotiva range is built around active ingredients at clinical concentrations. Niacinamide, Retinyl Palmitate, Salicylic Acid, Caffeine, CoQ10 — each selected for measurable, proven performance on real skin.</p>
+        </div>
+        <div class="standard-panel highlight">
+          <p class="t-eyebrow" style="margin-bottom:16px;">02 — Validation</p>
+          <h3 class="t-title" style="margin-bottom:20px;">DOCTOR APPROVED</h3>
+          <p class="t-body">Kotiva combines dermatologist approval with gentle, science-driven formulas — developed with evidence-based medicine and scientifically proven active ingredients, selected for safety, efficacy and skin compatibility.</p>
+        </div>
+        <div class="standard-panel highlight">
+          <p class="t-eyebrow" style="margin-bottom:16px;">03 — Precision</p>
+          <h3 class="t-title" style="margin-bottom:20px;">SKIN-TYPE SPECIFIC</h3>
+          <p class="t-body">Oily skin requires oil regulation, not moisture deprivation. Dry skin needs barrier repair, not surface hydration. Each Kotiva formulation addresses the actual biology of its target skin type.</p>
+        </div>
+        <div class="standard-panel">
+          <p class="t-eyebrow" style="margin-bottom:16px;">04 — Results</p>
+          <h3 class="t-title" style="margin-bottom:20px;">VISIBLE PERFORMANCE</h3>
+          <p class="t-body">We make bold, measurable claims because our ingredients deliver bold, measurable results. The Kotiva Standard doesn't settle for "your skin will feel softer." We aim for visible transformation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOCTOR APPROVED -->
+  <section class="doctor-section" id="doctor-approved">
+    <div class="container">
+      <div class="doctor-inner">
+        <div class="reveal">
+          <div class="doctor-badge-large">
+            <div class="doctor-badge-icon">⚕</div>
+            <div class="doctor-badge-title">Doctor<br>Approved</div>
+            <div class="doctor-badge-sub">Doctor-approved skincare, rooted in medical authenticity and dermatologist approval.</div>
+          </div>
+        </div>
+        <div class="reveal reveal-delay-2">
+          <p class="t-eyebrow" style="margin-bottom:20px; color:var(--taupe);">The Doctor Approved Difference</p>
+          <h2 class="t-headline" style="color:var(--fg); margin-bottom:28px;">WHAT "DOCTOR<br>APPROVED"<br>ACTUALLY MEANS</h2>
+          <p style="font-size:15px; line-height:1.8; color:var(--fg-mid); margin-bottom:20px; font-family:var(--font-body);">"Doctor Approved" is not a marketing phrase for Kotiva. It is the brand’s founding position: doctor-prescribed and doctor-approved skincare, developed with evidence-based medicine and powered by scientifically proven active ingredients.</p>
+          <p style="font-size:15px; line-height:1.8; color:var(--fg-mid); margin-bottom:36px; font-family:var(--font-body);">It means every formula is built on evidence-based medicine and scientifically proven active ingredients, carefully selected for safety, efficacy and skin compatibility.</p>
+          <a href="{{ theme.settings.get('kotiva_url_science') }}" class="btn btn-outline-dark">Discover Our Science</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA STRIP -->
+  <div class="about-cta-strip">
+    <div class="container">
+      <div class="about-cta-inner">
+        <div class="about-cta-text">Ready to start<br>your Kotiva routine?</div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="{{ theme.settings.get('kotiva_url_routine_finder') }}" class="btn btn-outline-dark">Find My Routine</a>
+          <a href="{{ theme.settings.get('kotiva_url_shop') }}" class="btn" style="background:var(--black);color:var(--off-white);">Explore Products</a>
+        </div>
+      </div>
+    </div>
+  </div>
+

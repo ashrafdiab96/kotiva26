@@ -1,0 +1,85 @@
+{#
+  KOTIVA home — BEST SELLERS — editorial showcase.
+  Ported 1:1 from the reference's resources/views/pages/home.blade.php; only URLs and asset
+  paths changed (components/kotiva/urls.twig, |asset).
+  Products: the reference's best sellers in its rail order (kotiva_bestsellers, generated from
+  the reference by scripts/export-reference-data.mjs). Links are the Salla product URLs;
+  kotiva-core.js refreshes them from the live store ([data-kotiva-sku]). No price, exactly as
+  the reference (commerce off — D-35 item 9).
+#}
+<!-- ═══════════════════════════════════════
+     BEST SELLERS — editorial showcase
+═══════════════════════════════════════ -->
+<section data-theme="editorial" class="bestsellers-section" aria-label="Best sellers">
+  <div class="bestsellers-bg" aria-hidden="true">
+    <img src="{{ 'kotiva/assets/home-bestsellers-bg-v2.webp'|asset }}" alt="" role="presentation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;opacity:0.28;" />
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 75% 50%,rgba(106,50,119,0.18) 0%,transparent 60%),linear-gradient(to right,rgba(106,50,119,0.98) 0%,rgba(106,50,119,0.70) 50%,rgba(106,50,119,0.85) 100%);"></div>
+  </div>
+  <!-- Horizontal scroll showcase — premium feel on mobile, grid on desktop -->
+  <!-- Pin-scrub rail (2026-08-18 round 4). Default state: .pin-rail-wrapper has no height
+       rule and .pin-rail-sticky has no position rule, so with no JS or with JS that decides
+       not to engage, this renders EXACTLY as the plain drag/scroll-snap rail below it always
+       has -- there is no tall empty scroll region unless the enhancement class is actually
+       applied. initPinRail() in js/animations.js adds .pin-active only when: motion is not
+       reduced, viewport is >=900px, and the pointer is fine (mouse/trackpad) -- touch/mobile
+       keeps the native swipeable rail, which is already the natural touch-equivalent gesture,
+       not a fallback. The "View All 25" link above is reachable independently of this rail's
+       focus behaviour, so keyboard users always have a guaranteed, ordinary path to the full
+       catalogue regardless of how the pin's scroll-linked transform behaves in any browser. -->
+  <div class="pin-rail-wrapper">
+   <div class="pin-rail-sticky">
+    <!-- K31 (2026-08-19): the header lives INSIDE the sticky frame now. Previously it sat
+         above the pin wrapper and scrolled away the moment the rail engaged, so for the whole
+         ~2.3k px of the pinned journey the visitor had no section title, no context and no
+         exit — just cards moving sideways. Keeping it pinned means the "View All 25" escape is
+         on screen for the entire interaction, not only before it starts. When .pin-active is
+         absent (touch, reduced motion, <900px) the sticky is a no-op and this simply renders
+         as an ordinary header above the swipeable rail, exactly as before. -->
+    <div class="container">
+      <div class="bestsellers-header">
+        <div>
+          <p class="t-eyebrow mb-16">Most Loved</p>
+          <h2 class="t-display t-display-md" style="color:var(--fg);">The Essentials</h2>
+        </div>
+        <a class="btn btn-outline-light" href="{{ theme.settings.get('kotiva_url_shop') }}" style="color:rgba(255,255,255,0.78);border-color:rgba(255,255,255,0.40);">View All {{ kotiva_catalog|length }} →</a>
+      </div>
+    </div>
+    <div class="bs-slider">
+    <button type="button" class="bs-arrow bs-arrow-prev" data-rail-dir="-1" aria-label="Previous products" disabled>&#8592;</button>
+    <button type="button" class="bs-arrow bs-arrow-next" data-rail-dir="1" aria-label="Next products">&#8594;</button>
+    <div class="bestsellers-scroll" role="region" aria-label="Best sellers">
+    <div class="bestsellers-track" data-stagger="70">
+      {% for sku in kotiva_bestsellers %}{% set p = kotiva_catalog[sku] %}
+      <a class="bs-card" href="{{ link(p.salla.path|trim('/', 'left')) }}" data-kotiva-sku="{{ p.sku }}" aria-label="{{ p.displayName }}">
+        <div class="bs-card-img"><img src="{{ ('kotiva/' ~ p.heroImage)|asset }}" alt="{{ p.displayName }}" width="200" height="200" style="--s:1.0" loading="lazy" /></div>
+        <div class="bs-card-body">
+          <div class="bs-card-name">{{ p.displayName }}</div>
+          <div class="bs-card-meta"><span class="bs-card-vol">{{ p.volume }}</span></div>
+          <div class="bs-card-foot"><span class="badge-concern">{{ p.concern }}</span><span class="bs-card-cta">Discover</span></div>
+        </div>
+      </a>
+{% endfor %}
+      <!-- K31 (2026-08-19): the rail's terminus. The centre-anchored geometry (round 5, fe0599e —
+           deliberately chosen over edge-flush after edge-flush was reported wrong) parks the LAST
+           track item at centre, which structurally leaves the trailing half of the frame empty.
+           Before this panel that emptiness was the ending: the journey simply ran out. Now the
+           closing hero moment is an invitation, and the geometry is untouched. It leads with the
+           count the visitor has NOT seen, because the header's "View All" total is on screen at
+           the same time and restating it would spend the most valuable frame in the section on an
+           echo. That count was hardcoded to 18 and held true by scripts/check-consistency.js.
+           With the catalog in the database and that gate retired, a literal here could go stale
+           the first time a product is deactivated — so it is derived: active products minus the
+           ones the rail just showed. -->
+      <a class="bs-end" href="{{ theme.settings.get('kotiva_url_shop') }}" aria-label="Explore the full KOTIVA range, {{ (kotiva_catalog|length) - (kotiva_bestsellers|length) }} more products">
+        <span class="bs-end-count">{{ (kotiva_catalog|length) - (kotiva_bestsellers|length) }}</span>
+        <span class="bs-end-label">more products<br/>in the full range</span>
+        <span class="bs-end-cta">Explore the range →</span>
+      </a>
+    </div>
+    </div>
+    </div>
+    <div class="bs-dots" role="group" aria-label="Choose product slide"></div>
+    <div class="pin-rail-progress" aria-hidden="true"></div>
+   </div>
+  </div>
+</section>

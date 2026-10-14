@@ -1,10 +1,10 @@
 input[type="radio"] {
   &.sr-only {
-    div.absolute {
+    div[class~="absolute"] { // KOTIVA: attribute selector — a .absolute class selector inside .kotiva-raed makes Tailwind's @apply absolute circular
       transition: all 0.3s;
     }
 
-    &:checked~div.absolute {
+    &:checked~div[class~="absolute"] {
       border-color: var(--color-main);
     }
   }

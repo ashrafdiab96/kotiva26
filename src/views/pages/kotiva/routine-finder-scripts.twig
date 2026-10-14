@@ -1,0 +1,260 @@
+{#
+  The Routine Finder controller — the reference's @push('scripts') block verbatim, except one
+  line: concern tile images come from window.KOTIVA_QUIZ_IMAGES (Theme settings, set in
+  routine-finder-pre-scripts.twig) instead of the Laravel path /img/quiz/concern-<id>.webp.
+#}
+<script>
+/* ── ROUTINE FINDER CONTROLLER (E5 rebuild, 2026-08-11) ──────────────
+   State only. All recommendation logic lives in js/routine-engine.js, and
+   all product knowledge in js/routine-model.js (generated from
+   data/routine-model.json). This file decides nothing about products. */
+(function () {
+  'use strict';
+  var MODEL = window.KOTIVA_ROUTINE_MODEL, ENGINE = window.KOTIVA_ENGINE;
+  var steps = [].slice.call(document.querySelectorAll('.quiz-step'));
+  var state = { zones: [], skinType: null, sensitive: null, concerns: [],
+                routineSize: null, experience: null, texture: null };
+  var answered = {}, cur = 0;
+
+  /* ---- concerns are rendered from the model, filtered by chosen zones ---- */
+  /* Concern ids with a card image in public/img/quiz (concern-<id>.webp).
+     Hair thinning has none yet, so its tile keeps an empty image frame.
+     The tiles are built after layout.js has run its lazy-image fade-in, so
+     they carry .loaded themselves or kotiva.css would leave them at opacity 0. */
+  var CONCERN_IMG = ['acne', 'oil', 'pigmentation', 'hydration', 'barrier', 'scars', 'ageing', 'sun'];
+
+  function renderConcerns() {
+    var wrap = document.getElementById('opts-concerns');
+    if (!wrap) return;
+    var zones = state.zones.length ? state.zones : ['face'];
+    var opts = MODEL.concerns.options.filter(function (o) {
+      return o.zones.some(function (z) { return zones.indexOf(z) !== -1; });
+    });
+    wrap.innerHTML = opts.map(function (o) {
+      var img = CONCERN_IMG.indexOf(o.id) !== -1
+        ? '<img class="loaded" src="' + esc(window.KOTIVA_QUIZ_IMAGES[o.id]) + '" alt="" width="480" height="480" loading="lazy">' : '';
+      return '<button class="quiz-option quiz-option--tile" type="button" aria-pressed="false" data-value="' + o.id + '">' +
+             '<span class="quiz-rank"></span><span class="quiz-option-media">' + img + '</span>' +
+             '<span class="quiz-option-head">' +
+             '<span class="quiz-option-title">' + o.label + '</span></span></button>';
+    }).join('');
+    state.concerns = state.concerns.filter(function (c) {
+      return opts.some(function (o) { return o.id === c; });
+    });
+    paintConcerns();
+  }
+
+  function paintConcerns() {
+    var wrap = document.getElementById('opts-concerns');
+    if (!wrap) return;
+    [].forEach.call(wrap.querySelectorAll('.quiz-option'), function (b) {
+      var i = state.concerns.indexOf(b.dataset.value);
+      b.classList.toggle('selected', i !== -1);
+      b.setAttribute('aria-pressed', i !== -1 ? 'true' : 'false');
+      b.querySelector('.quiz-rank').textContent = i === -1 ? '' : (i + 1);
+    });
+    var n = state.concerns.length;
+    document.getElementById('concern-hint').textContent =
+      n === 0 ? 'Pick at least one.' :
+      n === 3 ? 'Three selected — deselect one to change your order.' :
+                n + ' selected. You may pick ' + (3 - n) + ' more.';
+    answered.concerns = n > 0;
+  }
+
+  /* ---- generic option handling ---- */
+  document.querySelector('.quiz-wrap').addEventListener('click', function (e) {
+    var why = e.target.closest('[data-why]');
+    if (why) { why.parentNode.querySelector('.quiz-why-body').classList.toggle('open'); return; }
+    if (e.target.closest('#build-btn')) { build(); return; }
+    var next = e.target.closest('[data-next]');
+    if (next) { go(cur + 1); return; }
+    var back = e.target.closest('[data-back]');
+    if (back) { go(cur - 1); return; }
+
+    var btn = e.target.closest('.quiz-option');
+    if (!btn) return;
+    var step = btn.closest('.quiz-step');
+    var field = step.dataset.field;
+    var val = btn.dataset.value;
+
+    if (step.dataset.multi === 'true') {
+      var list = field === 'concerns' ? state.concerns : state.zones;
+      var i = list.indexOf(val);
+      if (i !== -1) list.splice(i, 1);
+      else {
+        var max = parseInt(step.dataset.max || '99', 10);
+        if (list.length >= max) return;
+        list.push(val);
+      }
+      if (field === 'concerns') paintConcerns();
+      else {
+        [].forEach.call(step.querySelectorAll('.quiz-option'), function (b) {
+          var on = state.zones.indexOf(b.dataset.value) !== -1;
+          b.classList.toggle('selected', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        answered.zones = state.zones.length > 0;
+      }
+    } else {
+      [].forEach.call(step.querySelectorAll('.quiz-option'), function (b) {
+        b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('selected'); btn.setAttribute('aria-pressed', 'true');
+      state[field] = field === 'sensitive' ? (val === 'yes') : (val === '' ? null : val);
+      answered[field] = true;   /* "No preference" is a real answer */
+    }
+    syncNav();
+  });
+
+  function syncNav() {
+    var step = steps[cur], field = step.dataset.field;
+    var btn = step.querySelector('[data-next]') || step.querySelector('#build-btn');
+    if (btn) btn.disabled = !answered[field];
+  }
+
+  function go(n) {
+    if (n < 0 || n >= steps.length) return;
+    if (n > cur && !answered[steps[cur].dataset.field]) return;
+    steps[cur].classList.remove('active');
+    document.getElementById('pdot-' + cur).classList.remove('active');
+    if (n > cur) document.getElementById('pdot-' + cur).classList.add('done');
+    else document.getElementById('pdot-' + n).classList.remove('done');
+    cur = n;
+    steps[cur].classList.add('active');
+    document.getElementById('pdot-' + cur).classList.add('active');
+    if (steps[cur].dataset.field === 'concerns') renderConcerns();
+    syncNav();
+    var sec = document.getElementById('quiz-section');
+    window.scrollTo({ top: sec.offsetTop - 80, behavior: 'smooth' });
+  }
+
+  /* ---- result ---- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  var SALLA_STORE_URL = window.SALLA_STORE_URL;
+  function productOf(id) {
+    return (window.KOTIVA && KOTIVA.getById) ? KOTIVA.getById(id) : null;
+  }
+  var STEP_LABEL = {
+    'makeup-removal': 'Remove', 'cleanser': 'Cleanse', 'toner': 'Tone',
+    'treatment': 'Treat', 'moisturizer': 'Moisturise', 'spf': 'Protect',
+    'hand-care': 'Hands', 'deodorant': 'Underarms',
+    'intimate-cleanser': 'Intimate cleanse', 'intimate-care': 'Intimate care',
+    'hair-cleanser': 'Wash', 'hair-treatment': 'Treat'
+  };
+
+  function renderSteps(list, title, icon) {
+    if (!list.length) return '';
+    return '<div class="result-time-block"><div class="result-time-label">' +
+      '<div class="result-time-icon">' + icon + '</div>' + esc(title) + '</div>' +
+      '<div class="result-steps">' + list.map(function (s, i) {
+        var product = productOf(s.id);
+        var href = (product && product.url) || SALLA_STORE_URL;
+        return '<a class="result-step" href="' + esc(href) + '">' +
+          '<div class="result-step-num">' + ('0' + (i + 1)).slice(-2) + '</div><div>' +
+          '<div class="result-step-label">' + esc(STEP_LABEL[s.step] || s.step) + '</div>' +
+          '<div class="result-step-product">' + esc(s.name) + '</div>' +
+          '<div class="result-step-why">' + esc(s.reason) + '</div>' +
+          (s.frequency ? '<div class="result-step-meta">' + esc(s.frequency) + '</div>' : '') +
+          (s.positioning ? '<div class="result-step-meta">' + esc(s.positioning) + '</div>' : '') +
+          (s.cautions && s.cautions.length ? '<div class="result-step-meta">' + esc(s.cautions.join(' ')) + '</div>' : '') +
+          '</div></a>';
+      }).join('') + '</div></div>';
+  }
+
+  function build() {
+    var r = ENGINE.build(state, MODEL);
+
+    var typeLabel = state.skinType ? state.skinType.charAt(0).toUpperCase() + state.skinType.slice(1) : '';
+    document.getElementById('result-title').textContent =
+      typeLabel ? typeLabel.toUpperCase() + ' SKIN ROUTINE' : 'YOUR KOTIVA ROUTINE';
+    document.getElementById('result-subtitle').textContent =
+      'Built from what you told us, using Kotiva’s own product guidance.';
+
+    /* what we heard — the reasoning is shown, not implied */
+    var chips = [];
+    state.zones.forEach(function (z) { chips.push(z.charAt(0).toUpperCase() + z.slice(1)); });
+    if (typeLabel) chips.push(typeLabel + ' skin');
+    if (state.sensitive) chips.push('Reacts easily');
+    state.concerns.forEach(function (c, i) {
+      var o = MODEL.concerns.options.filter(function (x) { return x.id === c; })[0];
+      chips.push((i + 1) + '. ' + (o ? o.label : c));
+    });
+    if (state.routineSize) chips.push(state.routineSize.charAt(0).toUpperCase() + state.routineSize.slice(1) + ' routine');
+    document.getElementById('result-summary').innerHTML =
+      '<div class="result-summary-title">What we based this on</div><div class="result-summary-list">' +
+      chips.map(function (c) { return '<span class="result-chip">' + esc(c) + '</span>'; }).join('') + '</div>';
+
+    document.getElementById('result-grid').innerHTML =
+      renderSteps(r.am, 'Morning', '☀') +
+      renderSteps(r.pm, 'Evening', '◑') +
+      renderSteps(r.anytime, 'Body & Hair', '○');
+
+    /* unmet concerns and add-ons — stated plainly rather than left silent */
+    var notes = [];
+    r.gaps.forEach(function (g) {
+      var o = MODEL.concerns.options.filter(function (x) { return x.id === g.concern; })[0];
+      var label = o ? o.label.toLowerCase() : g.concern;
+      var msg;
+      if (g.reason === 'sensitivity') {
+        msg = 'You told us your skin reacts easily, and Kotiva’s products for <strong>' + esc(label) +
+              '</strong> contain exfoliating acids. We have left them out rather than recommend something that may not suit you. Your pharmacist or doctor can advise if you would like to try them.';
+      } else if (g.reason === 'actives-experience') {
+        msg = 'Kotiva’s products for <strong>' + esc(label) + '</strong> combine several exfoliating acids. ' +
+              'As you are new to skincare we have left them out for now — worth revisiting once your routine is established.';
+      } else {
+        msg = 'We could not match <strong>' + esc(label) + '</strong> to a product in Kotiva’s current range, ' +
+              'so we have not put anything in its place.';
+      }
+      notes.push('<div class="result-note">' + msg + '</div>');
+    });
+    r.addons.forEach(function (a) {
+      notes.push('<div class="result-note">You may also want <strong>' + esc(a.name) + '</strong> — ' + esc(a.note) + '</div>');
+    });
+    document.getElementById('result-notes').innerHTML = notes.join('');
+
+    /* carry the recommendation through to the Salla store (K25 / S2-4).
+       SKUs, not ids or slugs: they are the one key this site and Salla share,
+       so the store's listing can pick the routine out with no product data
+       from here. Same shape as App\Support\Salla::listingUrl(). */
+    var skus = [];
+    [r.am, r.pm, r.anytime].forEach(function (half) {
+      half.forEach(function (s) {
+        var product = productOf(s.id);
+        var sku = product && product.sku ? String(product.sku).toUpperCase() : null;
+        if (sku && skus.indexOf(sku) === -1) skus.push(sku);
+      });
+    });
+    var cta = document.getElementById('shop-routine-cta');
+    if (cta && skus.length) cta.setAttribute('href', SALLA_STORE_URL + '/?routine=' + skus.map(function (s) { return encodeURIComponent(s); }).join(','));
+
+    document.getElementById('quiz-section').style.display = 'none';
+    var sec = document.getElementById('result-section');
+    sec.classList.add('visible');
+    window.scrollTo({ top: sec.offsetTop - 80, behavior: 'smooth' });
+  }
+
+  window.retakeQuiz = function () {
+    state = { zones: [], skinType: null, sensitive: null, concerns: [],
+              routineSize: null, experience: null, texture: null };
+    answered = {};
+    [].forEach.call(document.querySelectorAll('.quiz-option'), function (b) {
+      b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false');
+    });
+    steps.forEach(function (s, i) { s.classList.toggle('active', i === 0); });
+    [].forEach.call(document.querySelectorAll('.quiz-progress-dot'), function (d, i) {
+      d.classList.toggle('active', i === 0); d.classList.remove('done');
+    });
+    cur = 0; syncNav();
+    document.getElementById('quiz-section').style.display = '';
+    document.getElementById('result-section').classList.remove('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  renderConcerns();
+  syncNav();
+})();
+</script>

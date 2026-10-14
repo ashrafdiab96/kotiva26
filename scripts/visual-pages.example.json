@@ -1,0 +1,18 @@
+{
+  "_note": "Copy to scripts/visual-pages.json and fill in the THEME paths for this store (Salla page ids, a product id). 'reference' paths are on the Laravel site (KOTIVA_REF_URL) except the shop pages, which already live on the Salla store running the customizer (KOTIVA_REF_STORE_URL). 'theme' paths are on the theme preview (KOTIVA_THEME_URL). The routine-result family completes the quiz with tests/lib/routine.mjs ANSWERS before capturing.",
+  "families": [
+    { "id": "home",            "reference": "/",                       "theme": "/" },
+    { "id": "shop",            "reference": "store:/",                 "theme": "/latest-products" },
+    { "id": "product",         "reference": "store:/micellar-water/p1713901761", "theme": "/micellar-water/p1713901761" },
+    { "id": "cart",            "reference": "store:/cart",             "theme": "/cart" },
+    { "id": "about",           "reference": "/about",                  "theme": "/about/page-REPLACE" },
+    { "id": "science",         "reference": "/science",                "theme": "/science/page-REPLACE" },
+    { "id": "journal",         "reference": "/journal",                "theme": "/blog" },
+    { "id": "contact",         "reference": "/contact",                "theme": "/contact/page-REPLACE" },
+    { "id": "ingredients",     "reference": "/ingredients",            "theme": "/ingredients/page-REPLACE" },
+    { "id": "routine-finder",  "reference": "/routine-finder",         "theme": "/routine-finder/page-REPLACE" },
+    { "id": "routine-result",  "reference": "/routine-finder",         "theme": "/routine-finder/page-REPLACE", "quiz": true },
+    { "id": "privacy",         "reference": "/privacy-policy",         "theme": "/privacy-policy/page-REPLACE" },
+    { "id": "terms",           "reference": "/terms",                  "theme": "/terms/page-REPLACE" }
+  ]
+}

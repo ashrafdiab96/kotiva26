@@ -1,0 +1,29 @@
+{#
+  KOTIVA home — DOCTOR APPROVED — editorial.
+  Ported 1:1 from the reference's resources/views/pages/home.blade.php; only URLs and asset
+  paths changed (components/kotiva/urls.twig, |asset).
+#}
+<!-- ═══════════════════════════════════════
+     DOCTOR APPROVED — editorial
+═══════════════════════════════════════ -->
+<section data-theme="editorial-bg-white" class="doctor-section" aria-label="Doctor approved">
+  <div class="doctor-content reveal-left">
+    <!-- K33: the "The Kotiva Standard" eyebrow was deleted rather than reworded. It duplicated
+         the Brand-philosophy eyebrow above and collided with the heading of the section 5,400px
+         below, and this section needs no label: an 83px "Doctor Approved" stamp already says what
+         it is. Also thins the eyebrow-on-every-section cadence. -->
+    <h2 class="doctor-approved-stamp">Doctor<br/>Approved</h2>
+    <p class="t-body" style="color:var(--fg-mid);font-size:clamp(15px,1.5vw,18px);margin-bottom:0;">Every formula. Clinically supported.</p>
+    <p class="t-body" style="max-width:440px;">Every Kotiva formula is developed with evidence-based medicine and powered by scientifically proven active ingredients, carefully selected to deliver safe, effective and clinically supported results.</p>
+    <div class="credential-badges">
+      <span class="credential-badge">Paraben-Free</span>
+      <span class="credential-badge">Sulphate-Free</span>
+      <span class="credential-badge">Dermatologist-Approved</span>
+      <span class="credential-badge">Doctor-Approved</span>
+    </div>
+    <a class="btn btn-gold" href="{{ theme.settings.get('kotiva_url_science') }}">Our Science →</a>
+  </div>
+  <div class="doctor-image" style="position:relative;overflow:hidden;">
+    <img src="{{ 'kotiva/assets/home-doctor-approved-v5.webp'|asset }}" alt="A dermatologist in a white coat holding the real KOTIVA Micellar Water bottle, label clearly visible" loading="lazy" data-parallax="0.10" style="position:absolute;top:-7%;left:0;width:100%;height:114%;object-fit:cover;object-position:center 22%;" />
+  </div>
+</section>

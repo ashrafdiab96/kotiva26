@@ -32,6 +32,8 @@
 | user.is_profile_completed            | bool          |                                              |
 #}
 {% extends "layouts.master" %}
+{# KOTIVA: a Raed page kept as is — Raed's scoped resets/forms/buttons apply (DECISIONS T-06). #}
+{% block body_class %}kotiva-raed{% endblock %}
 
 {% block content %}
     <div class="h-62 -mb-52 w-full bg-primary rtl:right-0 ltr:left-0 relative -z-1 bg-cover bg-no-repeat bg-center"

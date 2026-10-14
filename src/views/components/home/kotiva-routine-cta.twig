@@ -1,0 +1,20 @@
+{#
+  KOTIVA home — ROUTINE FINDER CTA — editorial.
+  Ported 1:1 from the reference's resources/views/pages/home.blade.php; only URLs and asset
+  paths changed (components/kotiva/urls.twig, |asset).
+#}
+<!-- ═══════════════════════════════════════
+     ROUTINE FINDER CTA — editorial
+═══════════════════════════════════════ -->
+<section data-theme="editorial-bg-white" class="routine-cta" aria-label="Find your routine">
+  <div class="routine-cta-image">
+    <img src="{{ 'kotiva/assets/home-routine-ritual-v2.webp'|asset }}" alt="A woman applies face cream during her morning ritual in warm natural light" data-parallax="0.10" style="position:absolute;top:-7%;left:0;width:100%;height:114%;object-fit:cover;object-position:center 20%;transform:scaleX(-1);" />
+    <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(106,50,119,0.55) 0%,rgba(106,50,119,0.15) 60%,transparent 100%);"></div>
+  </div>
+  <div class="routine-cta-content reveal-right">
+    <p class="t-eyebrow">Personalised For You</p>
+    <h2 class="t-display t-display-md" style="color:var(--script);">Your skin.<br/>Your ritual.</h2>
+    <p class="t-body" style="max-width:380px;">Answer 7 questions about your skin type and concerns. We'll build your morning and evening routine from the Kotiva range — precisely matched to you.</p>
+    <a class="btn btn-gold" href="{{ theme.settings.get('kotiva_url_routine_finder') }}">Start the Quiz</a>
+  </div>
+</section>
