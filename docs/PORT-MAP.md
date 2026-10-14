@@ -1,0 +1,93 @@
+# KOTIVA → Salla theme: port map
+
+Every reference view and asset (`../website`, Laravel) mapped to its theme target, and every Salla
+variable, helper and component the theme relies on. The reasoning behind each judgement call is
+in [`DECISIONS.md`](DECISIONS.md) (T-numbers).
+
+## 1. Views
+
+| KOTIVA page | Reference view | Theme target | Data source |
+|---|---|---|---|
+| Layout: skip link, announcement bar, nav, mobile overlay, footer, theme toggle | `layouts/app.blade.php` | `layouts/master.twig`, `components/header/header.twig`, `components/footer/footer.twig`, `components/kotiva/urls.twig` | `store.url`, `link()`, `cart.items_count`, Theme settings (announcement, social, links, pages) |
+| Home: 12 sections | `pages/home.blade.php` | `pages/index.twig` → `{% component home %}` → `components/home/kotiva-{hero,marquee,credentials,philosophy,categories,doctor,routine-cta,bestsellers,ingredients,standard,ritual,newsletter}.twig` (rail markup in `components/kotiva/home-bestsellers.twig`) | Theme settings (`hero_*`); generated catalog (`kotiva_bestsellers`); Salla product URLs |
+| Shop listing | `shop/index.blade.php` (markup) + `salla/kotiva-salla.js` V6 (behaviour) | `pages/product/index.twig` → `components/kotiva/listing.twig` + `kotiva-listing.js` | generated catalog (server render) reconciled with `salla.product.fetch` (price, stock, ids, URLs) |
+| Category / tag / offers / search | — (Salla only) | same template, `source` mode | `salla.product.fetch({source: categories\|tags\|offers\|search})` |
+| Product page | `product/show.blade.php` | `pages/product/single.twig` → `components/kotiva/pdp.twig` + `kotiva-pdp.js` | `product.*`; SKU map; reference copy (`components/kotiva/copy.twig`), replaced by parsed `product.description` |
+| Cart | `cart/index.blade.php` | `pages/cart.twig` → `components/kotiva/cart.twig` + `kotiva-cart.js` | `cart.*`; `salla.cart.*` |
+| About | `pages/about.blade.php` | `pages/kotiva/about.twig` | static |
+| Science | `pages/science.blade.php` | `pages/kotiva/science{,-pre-scripts,-scripts}.twig` | static + `data-lite.js` |
+| Contact / Where to Buy | `pages/contact.blade.php` | `pages/kotiva/contact{,-scripts}.twig` | static; form → `kotivaSubmitToInbox()` → configured endpoint or email (T-07) |
+| Privacy policy | `pages/privacy-policy.blade.php` | `pages/kotiva/privacy-policy.twig` | static; host from `store.url` |
+| Terms | `pages/terms.blade.php` | `pages/kotiva/terms.twig` | static; host from `store.url` |
+| Ingredient glossary | `pages/ingredients.blade.php` + `app/Support/IngredientGlossary.php` | `pages/kotiva/ingredients{,-body}.twig` | `kotiva_glossary` (generated, 22 entries) → Salla product URLs |
+| Routine Finder | `pages/routine-finder.blade.php` + `public/js/routine-{engine,model}.js` | `pages/kotiva/routine-finder{,-pre-scripts,-scripts}.twig` + `kotiva-routine.js` | engine + model verbatim; products: SKU map + `salla.product.fetch` |
+| Journal | `pages/journal.blade.php` | `pages/blog/index.twig` (reuses `pages/kotiva/journal*.twig`) | Salla blog `articles`; the reference teasers while there are none (T-11) |
+| Journal article | — | `pages/blog/single.twig` → `components/kotiva/article.twig` | `article.*` |
+| Any other Salla page | — | `pages/page-single.twig` → `pages/partials/raed-page.twig` | Raed generic page |
+| Thank-you, customer area, loyalty, brands, testimonials | — | Raed's own templates, `body.kotiva-raed` | Raed, KOTIVA chrome + type (T-06) |
+
+Page dispatch (`pages/page-single.twig`): Salla page id ↔ Theme setting `kotiva_page_<key>`, or a
+`kotiva:<slug>` content marker, or the URL's title-slug segment (T-05).
+
+## 2. Assets
+
+Copied byte-for-byte by `scripts/sync-reference.mjs` into `src/assets/kotiva/` (→ `public/kotiva/`,
+never minified); `--check` verifies the hashes.
+
+| Reference | Theme | Notes |
+|---|---|---|
+| `public/css/kotiva.css`, `public/css/shop.css` | `kotiva/css/` | `shop.css` styles nav cart, sort row, stock states, cart (T-02) |
+| `public/js/layout.js`, `animations.js` | `kotiva/js/` | unchanged; theme glue in `kotiva-core.js` |
+| `public/js/routine-engine.js`, `routine-model.js` | `kotiva/js/` | unchanged (Routine Finder rule 1) |
+| `public/js/data-lite.js` | `kotiva/js/` | Science + Journal data; image paths rebased by `kotiva-core.js` |
+| `public/fonts/*.woff2` (4) | `kotiva/fonts/` | self-hosted; fixes the customizer's cross-origin font failure |
+| logos, favicons, company profile PDF | `kotiva/assets/` | PDF overridable by setting |
+| page imagery (about, science, home, shop hero, categories, ritual, journal) | `kotiva/assets/…` | only what a page loads |
+| `public/assets/products/kot0NN-*.webp`, `products/hero/*` | `kotiva/assets/products/` | listing cards + home rail (the customizer did the same); PDP gallery uses Salla's images |
+| `public/img/hero/1–4.jpeg` | `kotiva/img/hero/` | defaults for `hero_*` settings |
+| `public/img/quiz/skin-*`, `concern-*` | `kotiva/img/quiz/` | defaults for `routine_*` settings |
+
+Generated by `scripts/export-reference-data.mjs` (`--php` with mbstring):
+
+| Output | From | Used by |
+|---|---|---|
+| `src/assets/kotiva-theme/data/catalog.json` | `legacy/js/data-lite.js` + `data-full.js` (as ProductSeeder), `salla/kotiva-salla.js` PRODUCTS, `storage/app/salla-links.json`, `resources/routine/routine-model.json` | `kotiva-core.js` (bundled) |
+| `src/assets/kotiva-theme/data/product-copy.json` | same + `ScienceRenderer.php` (run as-is) | reference copy for the PDP (as data file) |
+| `src/assets/kotiva-theme/data/ingredients.json` | `resources/glossary/ingredients.json` × catalog | glossary data file |
+| `src/views/components/kotiva/data.twig` | catalog, glossary, best-seller order, filter counts | server-rendered listing, rail, PDP meta, glossary, cart |
+| `src/views/components/kotiva/copy.twig` | product copy + science HTML | PDP server render |
+
+## 3. Salla variables, helpers and components used
+
+**Twig globals and helpers:** `store.url`, `store.contacts.email`, `store.settings.tax.taxable_prices_enabled`,
+`store.settings.cart.apply_coupon_enabled`, `store.scope`, `theme.is_rtl`, `theme.font`,
+`theme.settings.get/set`, `language.code`, `user.can_access_wallet`, `page.{id,slug,title,url,content,type}`,
+`search_query`, `link()`, `is_page()`, `|asset`, `|cdn` (Salla's icon font only), `|money`, `|date`,
+`{% hook %}` (head:start, head, head:end, body:start, body:end, body:classes, product:single.*,
+cart:*), `{% component %}`.
+
+**Product:** `product.{id,name,sku,description,price,sale_price,is_on_sale,base_currency_price,status,type,is_out_of_stock,quantity,max_quantity,image,images,category,options,notify_availability,is_require_shipping,has_preorder_campaign,is_hidden_quantity,digital_files_settings}`.
+
+**Cart:** `cart.{items[],sub_total,tax_amount,discount,total,options}`, item `{id,product_id,url,product_name,product_image,quantity,max_quantity,price,product_price,total,is_available,is_hidden_quantity,type,options,detailed_offers}`.
+
+**Blog:** `articles[]{id,title,url,summary,image.url,has_image,created_at,tags[]}`, `article.{title,body,image,has_image,created_at,author,tags}`.
+
+**JS SDK:** `salla.product.fetch` (latest / search / categories / tags / offers; ≤32 per page),
+`salla.cart.{details,deleteItem,submit,event.onUpdated}`, `salla.form.onSubmit/onChange`,
+`salla.notify`, `salla.event.once`, `salla.onReady`.
+
+**Web components (all light DOM):** `salla-add-product-button`, `salla-button`, `salla-quantity-input`,
+`salla-slider`, `salla-installment`, `salla-comments`, `salla-cart-item-offers`, `salla-cart-coupons`,
+`salla-conditional-offer`, `salla-tiered-offer`, `salla-offer`, `salla-add-product-toast`,
+`salla-login-modal`, `salla-search`, `salla-offer-modal`, `salla-scopes`; Raed pages keep their own.
+
+## 4. Query contract
+
+| URL | Behaviour |
+|---|---|
+| `<store>/?filter=<key>` and `<store>/?routine=KOT…` | forwarded (before paint) to `/latest-products` with the query |
+| `/latest-products?filter=<key>` | pre-selects the pill; legacy keys `face`→`cleanser`, `treatments`→`treatment`, `sunscreen`→`spf` |
+| `/latest-products?sort=<featured\|price_asc\|price_desc\|name_asc\|newest>` | sort (customizer spellings accepted) |
+| `/latest-products?routine=KOT001,KOT005` | only those SKUs, in that order, with the dismissible notice |
+
+All three survive a refresh (state is written back with `history.replaceState`).

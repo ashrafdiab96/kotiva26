@@ -1,0 +1,30 @@
+{#
+  Every KOTIVA link target, resolved once per request and published with
+  theme.settings.set() so header, footer, pages and {% component %} sections all read the
+  same value: theme.settings.get('kotiva_url_<name>'). No template writes a store URL itself,
+  and none contains a hostname — everything is built from store.url / link().
+
+  Salla pages have no fixed slug-based URL (/<title-slug>/page-<id>), so each KOTIVA page is
+  configured in Theme settings by page ID (→ /redirect/pages/<id>, Salla's stable link) or by
+  full URL. An unconfigured page links to the store home rather than to a dead URL.
+  See docs/DECISIONS.md T-05.
+#}
+{% set _kotiva = theme.settings.set('kotiva_url_home', store.url) %}
+{% set _kotiva = theme.settings.set('kotiva_url_shop', link('latest-products')) %}
+{% set _kotiva = theme.settings.set('kotiva_url_cart', link('cart')) %}
+{% set _kotiva = theme.settings.set('kotiva_url_journal', link('blog')) %}
+{% for key in ['about', 'science', 'contact', 'ingredients', 'routine_finder', 'privacy_policy', 'terms'] %}
+  {% set ref = (theme.settings.get('kotiva_page_' ~ key) ?? '')|trim %}
+  {% if ref matches '/^\\d+$/' %}
+    {% set url = link('redirect/pages/' ~ ref) %}
+  {% elseif ref != '' %}
+    {% set url = ref %}
+  {% else %}
+    {% set url = store.url %}
+  {% endif %}
+  {% set _kotiva = theme.settings.set('kotiva_url_' ~ key, url) %}
+{% endfor %}
+{% set where_to_buy = (theme.settings.get('where_to_buy_url') ?? '')|trim %}
+{% set _kotiva = theme.settings.set('kotiva_url_where_to_buy', where_to_buy != '' ? where_to_buy : theme.settings.get('kotiva_url_contact')) %}
+{% set profile = (theme.settings.get('company_profile_url') ?? '')|trim %}
+{% set _kotiva = theme.settings.set('kotiva_url_company_profile', profile != '' ? profile : 'kotiva/assets/kotiva-company-profile.pdf'|asset) %}

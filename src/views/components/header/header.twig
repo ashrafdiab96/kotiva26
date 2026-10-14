@@ -1,86 +1,68 @@
 {#
+  KOTIVA navigation + mobile overlay — the reference layout's markup verbatim, with:
+    • hrefs from components/kotiva/urls.twig (Salla URLs, never a hostname);
+    • the cart control carrying a live count (the reference store held no cart, so its badge
+      was never rendered; Salla's cart is real). The count uses Raed's own [data-cart-count]
+      hook, which app.js updates on every salla cart event, and kotiva-core.js toggles
+      .is-empty — the badge styles already exist in the verbatim shop.css.
+  layout.js drives everything else (scroll state, logo swap, theme toggle, focus trap).
+
 | Variable         | Type    | Description                     |
 |------------------|---------|---------------------------------|
 | cart             | object  |                                 |
 | cart.items_count | int     |                                 |
-| cart.total       | string  | Formatted total ex: "١٠٠ ر.س"   |
 #}
-{% set important_links = theme.settings.get('important_links') %}
-<header data-testid="store-header" class="store-header">
-  {# Bullet Delivery tag — mobile: own full-width row above the top nav
-     (Figma "Mobile version"). Desktop keeps the inline pill below, next to
-     scopes. Both instances self-gate on the same backend flag; `lg:hidden`
-     matches the mobile/desktop split already used for the menu toggle below. #}
-  <div class="lg:hidden">
-    <salla-bullet-delivery-tag></salla-bullet-delivery-tag>
-  </div>
-
-  {# Top Nav #}
-  <div class="top-navbar">
-    <div class="container flex justify-between">
-      <div class="flex-1 flex items-center gap-2">
-          {# Footer Menu #}
-          {% if important_links %}
-            <salla-menu data-testid="store-header-topnav" source="footer" topnav></salla-menu>
-          {% endif %}
-
-          {# Language & Currency Component #}
-          <div class="header-buttons">
-              {% if store.settings.is_multilingual or store.settings.currencies_enabled %}
-                  <salla-localization-modal data-testid="store-header-localization" show-trigger></salla-localization-modal>
-              {% endif %}
-          </div>
-
-          {# Bullet Delivery tag — desktop only; mobile instance is above the top nav #}
-          <div class="hidden lg:block">
-            <salla-bullet-delivery-tag></salla-bullet-delivery-tag>
-          </div>
-
-          {# Scopes | Branches #}
-          {% if store.scope %}
-              <button class="btn--rounded-gray"
-                      onclick="salla.event.dispatch('scopes::open', {'mode': 'default'})">
-                  <i class="sicon-location rtl:ml-1 ltr:mr-1"></i> {{ store.scope.name }}
-              </button>
-          {% endif %}
-
-          {# Search bar #}
-          <div class="header-search flex-1">
-            <salla-search data-testid="store-header-search" inline oval height="36"></salla-search>
-          </div>
-      </div>
-
-      <salla-contacts data-testid="store-header-contacts" is-header></salla-contacts>
+{% set u = {
+  home: theme.settings.get('kotiva_url_home'),
+  shop: theme.settings.get('kotiva_url_shop'),
+  science: theme.settings.get('kotiva_url_science'),
+  journal: theme.settings.get('kotiva_url_journal'),
+  about: theme.settings.get('kotiva_url_about'),
+  buy: theme.settings.get('kotiva_url_where_to_buy'),
+  routine: theme.settings.get('kotiva_url_routine_finder'),
+  cart: theme.settings.get('kotiva_url_cart')
+} %}
+{% set cart_count = cart.items_count ?? 0 %}
+<nav class="nav transparent" id="main-nav" role="navigation" data-testid="store-header">
+  <div class="nav-inner">
+    <a class="nav-logo" href="{{ u.home }}" data-kotiva-nav="home" aria-label="KOTIVA Home">
+      <img class="logo-dark" src="{{ 'kotiva/assets/kotiva-logo.svg'|asset }}" alt="KOTIVA" height="28" />
+      <img class="logo-light" src="{{ 'kotiva/assets/kotiva-logo-white.svg'|asset }}" alt="KOTIVA" height="28" style="display:none;" />
+    </a>
+    <div class="nav-links" role="list">
+      <a class="nav-link" href="{{ u.home }}" data-kotiva-nav="home" role="listitem">Home</a>
+      <a class="nav-link" href="{{ u.shop }}" data-kotiva-nav="shop" role="listitem">Shop</a>
+      <a class="nav-link" href="{{ u.science }}" data-kotiva-nav="science" role="listitem">Science</a>
+      <a class="nav-link" href="{{ u.journal }}" data-kotiva-nav="journal" role="listitem">Journal</a>
+      <a class="nav-link" href="{{ u.about }}" data-kotiva-nav="about" role="listitem">About</a>
+      <a class="nav-link" href="{{ u.buy }}" data-kotiva-nav="where_to_buy" role="listitem">Where to Buy</a>
+    </div>
+    <div class="nav-right">
+      <a class="btn btn-gold btn-sm" href="{{ u.routine }}" data-kotiva-nav="routine_finder">Find My Routine</a>
+      <a class="nav-cart" href="{{ u.cart }}" aria-label="Open cart" data-testid="store-header-cart">
+        <span class="nav-cart-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </span>
+        <span class="nav-cart-badge{{ cart_count > 0 ? '' : ' is-empty' }}" data-cart-count aria-hidden="true">{{ cart_count }}</span>
+      </a>
+      <button class="nav-theme-btn" id="theme-toggle" aria-label="Switch to dark mode" title="Toggle light/dark">
+        <span class="icon-moon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>
+        <span class="icon-sun" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></span>
+      </button>
+      <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
+</nav>
 
-  {# Main Nav #}
-  <div id="mainnav" class="main-nav-container shadow-default bg-white flex items-center">
-      <div class="inner bg-inherit w-full">
-          <div class="container">
-              <div class="flex items-stretch justify-between relative">
-                  <div class="flex items-center">
-                      <a data-testid="store-header-mobile-toggle" class="lg:hidden mburger mburger--collapse leading-none rtl:ml-4 ltr:mr-4" href="#mobile-menu" aria-label="Open-menu">
-                        <i class="sicon-menu text-primary text-2xl"></i>
-                      </a>
-                      <a data-testid="store-header-logo" class="navbar-brand" href="{{ store.url }}">
-                          <img fetchpriority="high" width="100%" height="100%" loading="eager" src="{{ store.logo|cdn(175) }}" alt="{{ store.name }} logo">
-                          {% if is_page('index') %}
-                            <h1 class="sr-only">{{ store.name }}</h1>
-                          {% else %}
-                            <h2 class="sr-only">{{ store.name }}</h2>
-                          {% endif %}
-                      </a>
-                      <custom-main-menu></custom-main-menu>
-                  </div>
-                  <div class="flex items-center justify-end my-2.5">
-                      <salla-user-menu data-testid="store-header-user-menu" avatar-only show-header show-trigger></salla-user-menu>
-                      <salla-cart-summary data-testid="store-header-cart" class="ml-4 rtl:ml-[unset] rtl:mr-4">
-                        <i slot="icon" class="header-btn__icon icon sicon-shopping-bag"></i>
-                      </salla-cart-summary>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-</header>
+<!-- Mobile Overlay -->
+<div class="nav-overlay" role="dialog" aria-modal="true" aria-label="Navigation menu">
+  <a class="nav-link" href="{{ u.home }}" data-kotiva-nav="home">Home</a>
+  <a class="nav-link" href="{{ u.shop }}" data-kotiva-nav="shop">Shop</a>
+  <a class="nav-link" href="{{ u.science }}" data-kotiva-nav="science">Science</a>
+  <a class="nav-link" href="{{ u.journal }}" data-kotiva-nav="journal">Journal</a>
+  <a class="nav-link" href="{{ u.about }}" data-kotiva-nav="about">About</a>
+  <a class="nav-link" href="{{ u.buy }}" data-kotiva-nav="where_to_buy">Where to Buy</a>
+  <a class="btn btn-gold" href="{{ u.routine }}" data-kotiva-nav="routine_finder">Find My Routine</a>
+</div>

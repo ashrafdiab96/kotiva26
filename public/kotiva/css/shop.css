@@ -1,0 +1,1486 @@
+/* ============================================================
+   KOTIVA™ — Storefront e-commerce styles
+   Everything the shop needs that the original brochure site did
+   not: the sort control, stock states, cart, mini-cart drawer
+   and checkout.
+
+   Rules this file follows, deliberately:
+     • No new colour, type or spacing VALUES. Every declaration
+       resolves to a token already defined in kotiva.css, so the
+       palette audit's guarantee ("every colour literal is an
+       approved KOTIVA base colour") still holds for this file.
+     • Existing component classes (.btn, .filter-pill,
+       .product-card, .pdp-*) are extended, never redefined.
+     • Every component that renders on a themed surface gets an
+       html[data-mode="dark"] mirror, matching kotiva.css's own
+       dark-mode convention.
+   ============================================================ */
+
+/* ── SHOP CONTROLS ROW ─────────────────────────────────────
+   The filter pills were previously centred alone in the sticky
+   bar. Sorting joins them on the same row rather than in a new
+   band, so the sticky bar keeps its current height and the
+   product grid does not shift down. */
+.shop-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 24px;
+}
+
+.shop-sort {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shop-sort-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+/* Sort options are links, not buttons — they carry a real URL so
+   the sorted listing is shareable and crawlable, and they work
+   with JS off. They borrow .filter-pill wholesale; this only
+   restores the bits an <a> loses. */
+.shop-sort-pill {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* ── STOCK STATES ──────────────────────────────────────────
+   A sold-out product stays in the grid — hiding it loses the
+   browse context and makes the range look smaller than it is.
+   It is muted and labelled instead. */
+.product-card.is-sold-out .product-card-img img {
+  opacity: 0.45;
+  filter: grayscale(0.7);
+}
+
+.product-card.is-sold-out .product-card-price,
+.product-card.is-sold-out .product-card-desc,
+.product-card.is-sold-out .product-card-cta {
+  color: var(--fg-dim);
+}
+
+/* Sits on the image, using the PDP badge's exact type treatment
+   so the two read as one system. */
+.product-card-flag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  background: var(--fg);
+  color: var(--bg);
+}
+
+/* ── CART PAGE ─────────────────────────────────────────────
+   Built from the same primitives as the rest of the site: the
+   display face for labels and figures, the body face for prose,
+   hairline --border rules rather than cards-on-cards. */
+.cart-page {
+  padding-top: calc(var(--nav-h) + clamp(48px, 6vw, 88px));
+  padding-bottom: var(--gap-section);
+}
+
+.cart-head {
+  margin-bottom: clamp(32px, 4vw, 56px);
+}
+
+.cart-status,
+.cart-error {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  color: var(--fg);
+}
+
+.cart-error {
+  border-color: rgba(215, 40, 47, 0.30);
+  background: rgba(215, 40, 47, 0.06);
+}
+
+.cart-status {
+  border-color: rgba(0, 69, 57, 0.30);
+  background: rgba(0, 69, 57, 0.06);
+}
+
+/* Empty state — a way forward, not a dead end. */
+.cart-empty {
+  border: 1px solid var(--border);
+  padding: clamp(40px, 6vw, 72px);
+  text-align: center;
+}
+
+.cart-empty-line {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.4vw, 30px);
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin-bottom: 12px;
+}
+
+.cart-empty .btn {
+  margin-top: 24px;
+}
+
+.cart-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: clamp(32px, 4vw, 64px);
+  align-items: start;
+}
+
+.cart-items {
+  border-top: 1px solid var(--border);
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 88px 1fr auto auto auto;
+  gap: 20px;
+  align-items: center;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.cart-item-img {
+  display: block;
+  width: 88px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.cart-item-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-item-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.cart-item-name:hover {
+  color: var(--accent-text);
+}
+
+.cart-item-meta {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-top: 6px;
+}
+
+.cart-item-unit {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--fg-mid);
+  margin-top: 8px;
+}
+
+.cart-item-unit small {
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-left: 6px;
+}
+
+.cart-item-warn {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #EC7725;
+  margin-top: 8px;
+}
+
+.cart-item-qty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cart-qty-input {
+  width: 64px;
+  padding: 10px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+.cart-qty-apply {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-mid);
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.cart-qty-apply:hover {
+  color: var(--fg);
+  border-color: var(--border-strong);
+}
+
+.cart-item-total {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  min-width: 110px;
+  text-align: right;
+}
+
+.cart-item-remove {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  transition: color var(--transition);
+}
+
+.cart-item-remove:hover {
+  color: var(--script);
+}
+
+/* ── ORDER SUMMARY ─────────────────────────────────────────
+   Sticky on desktop so the total and the checkout button stay
+   reachable while a long cart is scrolled. */
+.cart-summary {
+  border: 1px solid var(--border);
+  padding: clamp(24px, 3vw, 32px);
+  position: sticky;
+  top: calc(var(--nav-h) + 24px);
+  background: linear-gradient(var(--bg-card), var(--bg-card)), var(--bg);
+}
+
+.cart-summary-title {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-bottom: 20px;
+}
+
+.cart-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--fg);
+  padding: 10px 0;
+}
+
+.cart-summary-muted {
+  color: var(--fg-dim);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cart-summary-note {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  padding: 6px 0 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cart-summary-total {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding-top: 18px;
+}
+
+.cart-checkout {
+  width: 100%;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.cart-continue {
+  width: 100%;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.cart-summary-cod {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--fg-dim);
+  margin-top: 16px;
+  text-align: center;
+}
+
+/* Screen-reader-only label, for the quantity inputs. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── DARK MODE ─────────────────────────────────────────────
+   Mirrors kotiva.css's html[data-mode="dark"] convention. The
+   tokens already flip; these are the cases where a value was
+   chosen against a light ground specifically. */
+html[data-mode="dark"] .shop-sort-label {
+  color: rgba(255, 255, 255, 0.64);
+}
+
+html[data-mode="dark"] .product-card.is-sold-out .product-card-img img {
+  opacity: 0.38;
+}
+
+html[data-mode="dark"] .product-card-flag {
+  background: #FFFFFF;
+  color: #231F20;
+}
+
+html[data-mode="dark"] .cart-status {
+  border-color: rgba(138, 183, 233, 0.40);
+  background: rgba(138, 183, 233, 0.10);
+}
+
+html[data-mode="dark"] .cart-error {
+  border-color: rgba(215, 40, 47, 0.45);
+  background: rgba(215, 40, 47, 0.12);
+}
+
+html[data-mode="dark"] .cart-qty-input {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+html[data-mode="dark"] .cart-qty-apply {
+  color: rgba(255, 255, 255, 0.78);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+html[data-mode="dark"] .cart-item-remove:hover {
+  color: #D39DD8;
+}
+
+/* ── MOBILE ────────────────────────────────────────────────
+   At ≤768px the pill row is already a horizontal scroller; the
+   sort row stacks beneath it rather than competing for that
+   scroll axis. The cart collapses to image + details, with the
+   controls on their own line. */
+@media (max-width: 768px) {
+  .shop-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .shop-sort {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .shop-sort::-webkit-scrollbar {
+    display: none;
+  }
+
+  .shop-sort-pill {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 1000px) {
+  .cart-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-summary {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .cart-item {
+    grid-template-columns: 72px 1fr;
+    grid-template-areas:
+      "img body"
+      "qty total"
+      "remove remove";
+    gap: 14px 16px;
+  }
+
+  .cart-item-img { grid-area: img; width: 72px; }
+  .cart-item-body { grid-area: body; }
+  .cart-item-qty { grid-area: qty; }
+  .cart-item-total { grid-area: total; text-align: right; min-width: 0; }
+  .cart-item-remove { grid-area: remove; justify-self: start; padding-left: 0; }
+}
+
+/* ── NAV CART CONTROL ──────────────────────────────────────
+   One new control in the header. It borrows .nav-theme-btn's
+   geometry so the right-hand cluster keeps its rhythm rather
+   than gaining an odd-sized sibling. */
+.nav-cart {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--fg-mid);
+  text-decoration: none;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.nav-cart:hover {
+  color: var(--fg);
+  border-color: var(--border-strong);
+}
+
+.nav-cart-icon {
+  display: inline-flex;
+}
+
+/* The count rides the icon rather than sitting beside it, so the
+   control's width never changes as items are added. */
+.nav-cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-deep);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+}
+
+.nav-cart-badge.is-empty {
+  display: none;
+}
+
+/* The nav is transparent over a dark hero until it scrolls. */
+.nav.transparent .nav-cart {
+  color: rgba(255, 255, 255, 0.78);
+  border-color: rgba(255, 255, 255, 0.40);
+}
+
+.nav.transparent .nav-cart:hover {
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+}
+
+/* ── MINI-CART DRAWER ──────────────────────────────────────
+   Slides in from the right. Hidden by default with visibility
+   as well as transform, so its links are never reachable by
+   keyboard while closed. */
+.mini-cart {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.mini-cart.open {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mini-cart-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(35, 31, 32, 0.48);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.mini-cart.open .mini-cart-scrim {
+  opacity: 1;
+}
+
+.mini-cart-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  transform: translateX(100%);
+  transition: transform var(--transition);
+}
+
+.mini-cart.open .mini-cart-panel {
+  transform: translateX(0);
+}
+
+.mini-cart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mini-cart-title {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.mini-cart-close {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--fg-mid);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.mini-cart-close:hover {
+  color: var(--fg);
+}
+
+.mini-cart-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.mini-cart-item {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mini-cart-item-img {
+  display: block;
+  width: 56px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.mini-cart-item-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mini-cart-item-name {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.mini-cart-item-name:hover {
+  color: var(--accent-text);
+}
+
+.mini-cart-item-meta {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--fg-dim);
+  margin-top: 5px;
+}
+
+.mini-cart-item-total {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.mini-cart-empty {
+  padding: 40px 28px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  text-align: center;
+}
+
+.mini-cart-foot {
+  border-top: 1px solid var(--border);
+  padding: 22px 28px calc(22px + env(safe-area-inset-bottom));
+}
+
+.mini-cart.is-empty .mini-cart-foot .btn {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.mini-cart-subtotal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--fg);
+}
+
+/* The drawer now states net, VAT and gross rather than one figure, so the rows
+   need breathing room and a clear hierarchy: the VAT line is supporting
+   detail, the inclusive total is the one that matters. */
+.mini-cart-subtotal-row + .mini-cart-subtotal-row {
+  margin-top: 6px;
+}
+
+.mini-cart-subtotal-row small {
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-left: 5px;
+}
+
+.mini-cart-vat-row {
+  font-weight: 600;
+  color: var(--fg-dim);
+}
+
+.mini-cart-total-row {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.mini-cart-note {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin: 10px 0 18px;
+}
+
+.mini-cart-view,
+.mini-cart-checkout {
+  width: 100%;
+  justify-content: center;
+}
+
+.mini-cart-view {
+  margin-bottom: 10px;
+}
+
+/* ── TOAST ─────────────────────────────────────────────────
+   Bottom-centre so it never covers the nav or the drawer's
+   action buttons. */
+.kv-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translate(-50%, 16px);
+  z-index: 1400;
+  max-width: min(440px, calc(100vw - 32px));
+  padding: 14px 22px;
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.kv-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.kv-toast.is-error {
+  background: var(--script);
+  color: #FFFFFF;
+}
+
+/* A row mid-request: answered immediately, restored on failure. */
+.cart-item.is-busy {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Inline stock ceiling, shown on the control that was refused. */
+.stock-hint {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #EC7725;
+  margin-top: 8px;
+}
+
+/* ── DARK MODE ─────────────────────────────────────────── */
+html[data-mode="dark"] .nav-cart {
+  color: rgba(255, 255, 255, 0.78);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+html[data-mode="dark"] .nav-cart:hover {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.40);
+}
+
+html[data-mode="dark"] .nav-cart-badge {
+  background: #8AB7E9;
+  color: #231F20;
+}
+
+html[data-mode="dark"] .mini-cart-panel {
+  border-left-color: rgba(255, 255, 255, 0.14);
+}
+
+html[data-mode="dark"] .mini-cart-close {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+html[data-mode="dark"] .kv-toast {
+  background: #FFFFFF;
+  color: #231F20;
+}
+
+html[data-mode="dark"] .kv-toast.is-error {
+  background: #D7282F;
+  color: #FFFFFF;
+}
+
+@media (max-width: 480px) {
+  .mini-cart-panel {
+    width: 100%;
+  }
+}
+
+/* Respect a reduced-motion preference: the drawer still opens,
+   it simply stops sliding. */
+@media (prefers-reduced-motion: reduce) {
+  .mini-cart-panel,
+  .mini-cart-scrim,
+  .kv-toast {
+    transition: none;
+  }
+}
+
+/* ── PDP BUY BOX ───────────────────────────────────────────
+   Sits where "Where to Buy" used to, above the secondary
+   routine-finder CTA, so the primary action is the first thing
+   under the product's own facts. */
+.pdp-buy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pdp-qty-select {
+  appearance: none;
+  padding: 14px 18px;
+  min-height: 48px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.pdp-add {
+  flex: 1 1 200px;
+  justify-content: center;
+  min-height: 48px;
+}
+
+.pdp-add[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pdp-buy .stock-hint {
+  flex: 1 0 100%;
+  margin-top: 0;
+}
+
+html[data-mode="dark"] .pdp-qty-select {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ── LISTING CARD: LINK + ADD TO CART ──────────────────────
+   The card became a cell so the add-to-cart form could sit
+   beside the product link instead of illegally inside it. The
+   cell keeps .product-card, so every existing card rule — the
+   hover lift, the border, the composited background — still
+   applies exactly as before; these rules only restore the
+   column flow the anchor used to provide and style the new
+   control. */
+.product-card-link {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-card-add {
+  padding: 0 clamp(16px, 2vw, 24px) clamp(16px, 2vw, 24px);
+}
+
+.product-card-add-btn {
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 18px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.product-card-add-btn:hover:not([disabled]) {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+.product-card-add-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-color: var(--border);
+  color: var(--fg-dim);
+}
+
+html[data-mode="dark"] .product-card-add-btn {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+html[data-mode="dark"] .product-card-add-btn:hover:not([disabled]) {
+  background: #FFFFFF;
+  color: #231F20;
+  border-color: #FFFFFF;
+}
+
+/* ── CHECKOUT ──────────────────────────────────────────────
+   Same primitives as the cart: hairline rules, the display
+   face for labels and figures, no cards-on-cards. */
+.checkout-page {
+  padding-top: calc(var(--nav-h) + clamp(48px, 6vw, 88px));
+  padding-bottom: var(--gap-section);
+}
+
+.checkout-head {
+  margin-bottom: clamp(24px, 3vw, 40px);
+}
+
+/* ── STEPPER ─────────────────────────────────────────────── */
+.checkout-steps {
+  margin-bottom: clamp(28px, 4vw, 48px);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.checkout-steps-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: clamp(16px, 4vw, 56px);
+  justify-content: center;
+}
+
+.checkout-step {
+  padding: 18px 0;
+}
+
+.checkout-step-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.checkout-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  font-size: 9px;
+}
+
+.checkout-step.is-current .checkout-step-link { color: var(--fg); }
+.checkout-step.is-current .checkout-step-num {
+  background: var(--accent-deep);
+  border-color: var(--accent-deep);
+  color: #FFFFFF;
+}
+.checkout-step.is-done .checkout-step-link { color: var(--fg-mid); }
+.checkout-step.is-done .checkout-step-num {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+}
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: clamp(32px, 4vw, 64px);
+  align-items: start;
+}
+
+.checkout-panel {
+  border: 1px solid var(--border);
+  padding: clamp(20px, 3vw, 32px);
+  margin-bottom: 20px;
+}
+
+.checkout-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.checkout-panel-title {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.checkout-edit {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  text-decoration: none;
+}
+
+.checkout-edit:hover { text-decoration: underline; }
+
+.checkout-address {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--fg-mid);
+  font-style: normal;
+}
+
+.checkout-address-note {
+  margin-top: 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--fg-dim);
+}
+
+/* ── FORM ────────────────────────────────────────────────── */
+.checkout-form .form-error,
+.form-error {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--script);
+  margin-top: 8px;
+}
+
+.form-field.has-error { border-color: var(--script); }
+
+.form-optional {
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--fg-dim);
+  text-transform: none;
+}
+
+/* ── CHECKOUT FIELDS ─────────────────────────────────────
+   .form-field / .form-row / .form-submit were only ever declared inside the
+   contact page's own <style> block, so checkout rendered them as raw browser
+   controls. They are declared here scoped to .checkout-form: the contact page
+   keeps its editorial underline fields, and checkout gets bordered boxes,
+   which suit a ten-field address form and make the .has-error border visible.
+   ─────────────────────────────────────────────────────── */
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.checkout-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.checkout-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* kotiva.css gives .form-group a bottom margin; here the column gap above
+     owns the rhythm, so the two must not stack. */
+  margin-bottom: 0;
+}
+
+.checkout-form .form-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.checkout-form .form-field {
+  width: 100%;
+  min-height: 50px;
+  padding: 13px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  /* background-COLOR, never the shorthand: select.form-field paints its chevron
+     through background-image, and a later shorthand would reset the image's
+     repeat and position and tile it across the field. */
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.checkout-form .form-field::placeholder { color: var(--fg-dim); }
+
+.checkout-form .form-field:focus {
+  border-color: var(--accent-text);
+  box-shadow: 0 0 0 3px rgba(0, 93, 186, 0.15);
+}
+
+/* Redeclared after :focus so an invalid field still reads red while focused. */
+.checkout-form .form-field.has-error { border-color: var(--script); }
+.checkout-form .form-field.has-error:focus {
+  border-color: var(--script);
+  box-shadow: 0 0 0 3px rgba(215, 40, 47, 0.16);
+}
+
+.checkout-form select.form-field {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23005DBA' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  /* The expanded <option> list is painted by the OS, not the page. Without a
+     declared scheme the popup renders light while the options inherit the
+     page's light-on-dark text — invisible in dark mode. Same fix as contact. */
+  color-scheme: light;
+}
+
+.checkout-form select.form-field option,
+.checkout-form select.form-field optgroup { color: #231F20; background: #FFFFFF; }
+
+.checkout-form textarea.form-field {
+  min-height: 110px;
+  resize: vertical;
+}
+
+/* Native checkbox and radio, tinted and sized up — the defaults were tiny and
+   read as browser chrome next to the rest of the page. */
+.checkout-check input,
+.checkout-method input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--k-blue);
+  cursor: pointer;
+}
+
+.checkout-form .form-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  margin-top: 6px;
+  padding: 16px 32px;
+  border: 1.5px solid var(--fg);
+  border-radius: var(--radius-pill);
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.checkout-form .form-submit:hover:not([disabled]) {
+  background: var(--k-blue);
+  color: var(--k-white);
+  border-color: var(--k-blue);
+  transform: translateY(-1px);
+}
+
+.checkout-form .form-submit:focus-visible {
+  outline: 2px solid var(--accent-deep);
+  outline-offset: 3px;
+}
+
+.checkout-form .form-submit[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* The payment step's only method sits selected on load; give it a visible
+   selected state rather than leaving it identical to an unchosen option. */
+.checkout-method.is-selected,
+.checkout-method:has(input:checked) {
+  border-color: var(--accent-text);
+  background: var(--bg-card);
+}
+
+html[data-mode="dark"] .checkout-form .form-field {
+  border-color: rgba(255, 255, 255, 0.28);
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+html[data-mode="dark"] .checkout-form .form-field:focus {
+  box-shadow: 0 0 0 3px rgba(138, 183, 233, 0.22);
+}
+
+html[data-mode="dark"] .checkout-form select.form-field {
+  color-scheme: dark;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238AB7E9' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+}
+
+html[data-mode="dark"] .checkout-form select.form-field option,
+html[data-mode="dark"] .checkout-form select.form-field optgroup { color: #FFFFFF; background: #231F20; }
+
+@media (max-width: 640px) {
+  .checkout-form .form-row { grid-template-columns: 1fr; }
+}
+
+.checkout-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 18px 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--fg-mid);
+  cursor: pointer;
+}
+
+.checkout-check input { margin-top: 4px; flex-shrink: 0; }
+
+/* ── PAYMENT METHOD ──────────────────────────────────────── */
+.checkout-method {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--border-strong);
+  cursor: pointer;
+}
+
+.checkout-method input { margin-top: 4px; flex-shrink: 0; }
+
+.checkout-method-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.checkout-method-note {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--fg-dim);
+  margin-top: 6px;
+}
+
+/* ── WARNINGS ────────────────────────────────────────────── */
+.checkout-warning {
+  border: 1px solid #EC7725;
+  background: rgba(236, 119, 37, 0.07);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--fg);
+}
+
+.cart-summary-line {
+  font-size: 11px;
+  color: var(--fg-mid);
+  padding: 6px 0;
+}
+
+/* ── CONFIRMATION ────────────────────────────────────────── */
+.confirmation-head {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto clamp(32px, 4vw, 56px);
+}
+
+.confirmation-lede {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--fg-mid);
+  margin-top: 16px;
+}
+
+.confirmation-number {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 28px auto 0;
+  padding: 18px 32px;
+  border: 1px solid var(--border-strong);
+}
+
+.confirmation-number-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.confirmation-number-value {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--fg);
+}
+
+.confirmation-estimate {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-mid);
+  margin-top: 16px;
+}
+
+html[data-mode="dark"] .checkout-warning {
+  border-color: #EC7725;
+  background: rgba(236, 119, 37, 0.12);
+}
+
+html[data-mode="dark"] .checkout-step.is-current .checkout-step-num {
+  background: #8AB7E9;
+  border-color: #8AB7E9;
+  color: #231F20;
+}
+
+html[data-mode="dark"] .checkout-step.is-done .checkout-step-num {
+  background: #FFFFFF;
+  border-color: #FFFFFF;
+  color: #231F20;
+}
+
+@media (max-width: 1000px) {
+  .checkout-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .checkout-steps-list { gap: 12px; }
+  .checkout-step-label { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANNOUNCEMENT BAR (§7.6)
+   Rendered above the nav when the setting is on.
+
+   kotiva.css fixes .nav at top:0 with height:var(--nav-h), and six rules
+   offset page content with calc(var(--nav-h) + …). Rather than edit any of
+   them, has-announcement retunes --nav-h to include the bar, so every one of
+   those offsets self-corrects — and .nav's own height is re-pinned here,
+   since it would otherwise grow with the token.
+   ═══════════════════════════════════════════════════════════════════ */
+:root { --announce-h: 40px; }
+
+html.has-announcement { --nav-h: calc(72px + var(--announce-h)); }
+html.has-announcement .nav { height: 72px; top: var(--announce-h); }
+
+/* The nav auto-hides on scroll and sticky elements re-offset to 0; with a bar
+   present they must stop below it instead of sliding underneath. */
+html.has-announcement.nav-hidden .filter-sticky { top: var(--announce-h); }
+
+.kotiva-announce {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--announce-h);
+  z-index: 1001; /* above .nav's 1000, so the nav hides behind it */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  background: #005DBA;
+  color: #FFFFFF;
+}
+
+.kotiva-announce-text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  /* Single line, always. A wrapping bar would make --announce-h a lie and the
+     nav would sit on top of the page content. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  :root { --announce-h: 36px; }
+  .kotiva-announce-text { font-size: 9px; letter-spacing: 0.14em; }
+}

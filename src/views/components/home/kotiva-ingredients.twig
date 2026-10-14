@@ -1,0 +1,39 @@
+{#
+  KOTIVA home — INGREDIENT SPOTLIGHT — clinical.
+  Ported 1:1 from the reference's resources/views/pages/home.blade.php; only URLs and asset
+  paths changed (components/kotiva/urls.twig, |asset).
+#}
+<!-- ═══════════════════════════════════════
+     INGREDIENT SPOTLIGHT — clinical
+═══════════════════════════════════════ -->
+<section data-theme="ritual" class="section-pad" aria-label="Hero ingredients">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header-left">
+        <p class="t-eyebrow mb-16">Active Intelligence</p>
+        <h2 class="t-display t-display-md">The Ingredients</h2>
+      </div>
+      <a class="btn btn-text" href="{{ theme.settings.get('kotiva_url_science') }}">Full Science →</a>
+    </div>
+    <div class="ingredient-grid">
+      <div class="ingredient-card reveal-scale">
+        <div class="ingredient-name">Niacinamide</div>
+        <div class="ingredient-benefit">Pore Refinement & Even Tone</div>
+        <p class="ingredient-desc">A validated form of Vitamin B3 that minimises pore appearance, controls sebum production, and visibly evens skin tone through consistent daily use.</p>
+        <a class="btn btn-text mt-16" href="{{ theme.settings.get('kotiva_url_science') }}">Learn More →</a>
+      </div>
+      <div class="ingredient-card reveal-scale reveal-delay-2">
+        <div class="ingredient-name">Hyaluronic Acid</div>
+        <div class="ingredient-benefit">Deep Molecular Hydration</div>
+        <p class="ingredient-desc">Holds up to 1000× its weight in water. Our multi-weight complex hydrates at every level of the skin — surface, mid, and deep dermal layers.</p>
+        <a class="btn btn-text mt-16" href="{{ theme.settings.get('kotiva_url_science') }}">Learn More →</a>
+      </div>
+      <div class="ingredient-card reveal-scale reveal-delay-4">
+        <div class="ingredient-name">Retinyl Palmitate</div>
+        <div class="ingredient-benefit">Supports Skin Renewal</div>
+        <p class="ingredient-desc">A vitamin A derivative that supports skin renewal and improves the appearance of texture and fine lines, working with the skin’s overnight regeneration cycle.</p>
+        <a class="btn btn-text mt-16" href="{{ theme.settings.get('kotiva_url_science') }}">Learn More →</a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -7,6 +7,8 @@
 | brands     | Collection[] | Brands grouped by char, ex:{b:[{'name':'brand1',...},...]} |
 #}
 {% extends "layouts.master" %}
+{# KOTIVA: a Raed page kept as is — Raed's scoped resets/forms/buttons apply (DECISIONS T-06). #}
+{% block body_class %}kotiva-raed{% endblock %}
 {% block content %}
     <div class="container mb-20">
 

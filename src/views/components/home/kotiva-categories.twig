@@ -1,0 +1,96 @@
+{#
+  KOTIVA home — CATEGORY GRID — ritual.
+  Ported 1:1 from the reference's resources/views/pages/home.blade.php; only URLs and asset
+  paths changed (components/kotiva/urls.twig, |asset).
+#}
+<!-- ═══════════════════════════════════════
+     CATEGORY GRID — ritual
+═══════════════════════════════════════ -->
+<section data-theme="ritual" aria-label="Product categories">
+  <!-- K36: this was the ONLY major section on the page with no heading of any kind — six
+       full-bleed image tiles arrived unannounced, so the block's job had to be inferred from
+       the tiles themselves. The vault's own page-section guide (40_projects/kotiva/
+       page-section-guide-2026-06-14.md) already assigns it one: "lets visitors self-segment by
+       need and enter the catalogue", answering the visitor question "Where do I start for my
+       concern?". The heading states that role instead of leaving it implicit. Kept to three
+       words and given no eyebrow — the page already carries five, and adding a sixth to fix a
+       missing heading would trade one scaffold problem for another. -->
+  <div class="container">
+    <h2 class="t-display t-display-md category-grid-heading">Where to Start</h2>
+  </div>
+  <div class="category-grid" data-stagger="60">
+
+    <a class="category-card" href="{{ theme.settings.get('kotiva_url_shop') }}?filter=cleanser" aria-label="Shop Face Care">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ 'kotiva/assets/categories/cat-face-v3.webp'|asset }}" alt="A woman with olive skin resting in warm sunlight, her skin clear and glowing." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">Face</div>
+        <div class="category-card-count">16 products</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+    <a class="category-card" href="{{ theme.settings.get('kotiva_url_shop') }}?filter=body" aria-label="Shop Body Care">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ 'kotiva/assets/categories/cat-body-v3.webp'|asset }}" alt="A woman smoothing body cream along her arm in soft morning light." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">Body</div>
+        <div class="category-card-count">8 products</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+    <a class="category-card" href="{{ theme.settings.get('kotiva_url_shop') }}?filter=serums" aria-label="Shop Serums">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ 'kotiva/assets/categories/cat-serums-v3.webp'|asset }}" alt="A golden droplet of serum falling from a glass dropper." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">Serums</div>
+        <div class="category-card-count">1 product</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+    <a class="category-card" href="{{ theme.settings.get('kotiva_url_shop') }}?filter=treatment" aria-label="Shop Treatments">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ 'kotiva/assets/categories/cat-treatments-v4.webp'|asset }}" alt="A woman pressing treatment cream into her cheek with her fingertips." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">Treatments</div>
+        <div class="category-card-count">7 products</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+    <a class="category-card" href="{{ theme.settings.get('kotiva_url_shop') }}?filter=spf" aria-label="Shop Sunscreen">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ 'kotiva/assets/categories/cat-spf-v3.webp'|asset }}" alt="A woman turning her face toward warm sunlight, skin protected and even." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">SPF</div>
+        <div class="category-card-count">3 products</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+    <a class="category-card" href="{{ theme.settings.get('kotiva_url_shop') }}?filter=hair" aria-label="Shop Hair Care">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ 'kotiva/assets/categories/cat-hair-v3.webp'|asset }}" alt="Long healthy hair backlit by sunlight, seen from behind." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">Hair</div>
+        <div class="category-card-count">2 products</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+  </div>
+</section>

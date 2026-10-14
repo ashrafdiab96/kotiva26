@@ -1,0 +1,72 @@
+{#
+  KOTIVA home — TESTIMONIALS — ritual.
+  Ported 1:1 from the reference's resources/views/pages/home.blade.php; only URLs and asset
+  paths changed (components/kotiva/urls.twig, |asset).
+#}
+<!-- ═══════════════════════════════════════
+     TESTIMONIALS — ritual
+═══════════════════════════════════════ -->
+<!-- THE KOTIVA STANDARD
+     Replaced the three homepage testimonials 2026-08-11 (K27). The previous
+     quotes were attributed to named individuals, carried 5-star ratings, and
+     cited three products that do not exist in the 25-SKU catalogue, alongside
+     an unsupported efficacy claim with a timeframe. (The removed names are
+     recorded in the vault, deliberately not repeated here: leaving them in
+     served markup would keep feeding nonexistent products to crawlers and AI
+     retrieval, which is most of the harm.) Every statement below is drawn from the
+     client's own Company Profile and carries no customer-review signalling —
+     no names, no star ratings, no first-person voice, no time-to-result claim.
+     Genuine customer testimonials remain an open request to KOTIVA; nothing
+     here may be relabelled as one until they supply them. -->
+<section data-theme="ritual" class="section-pad" aria-label="The Kotiva Standard">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header-left">
+        <!-- K33: eyebrow "Doctor Approved Skincare" deleted. It was the mirror image of the
+             Doctor Approved section above (which carried "The Kotiva Standard" as ITS eyebrow) —
+             the two sections had each other's names. "The Kotiva Standard" now names exactly one
+             section: this one, which is the only place that actually enumerates the standard. -->
+        <h2 class="t-display t-display-md">The Kotiva Standard</h2>
+      </div>
+    </div>
+    <!-- K33 (2026-08-19): these were .testimonial-card, and the CONTENT is correct — K27
+         (038b822) replaced three fabricated testimonials (named people, 5-star ratings, three
+         products that do not exist in the 25-SKU catalogue) with statements sourced from the
+         client's own Company Profile, and the "Kotiva Company Profile" line is deliberate
+         honesty: it tells the reader KOTIVA is the source, so this cannot be mistaken for
+         third-party endorsement. K27 also suppressed the decorative quote glyph and the italic
+         voice for exactly that reason.
+
+         What it could not fix from a modifier class was the LAYOUT. The card kept testimonial
+         anatomy — body copy first, then a rule, then a bottom-pinned attribution block — which
+         is the visual grammar of a quotation regardless of which glyphs are hidden. So the
+         section still read as "three people vouching for us," which is the precise impression
+         K27 existed to prevent.
+
+         Rebuilt label-first: the scannable fact leads, the body explains, the source stays but
+         is demoted to provenance rather than a signature. Not a new invention — it is the
+         pattern this same page already uses twice (Brand philosophy's value blocks and The
+         Ingredients), so the two sections after Best Sellers now share one grammar instead of
+         opposite ones. Copy is unchanged, verbatim, including the attribution.
+
+         .testimonial-* is left intact and unused: genuine testimonials are still an open client
+         request, and the component should be waiting when they arrive. -->
+    <div class="fact-grid">
+      <article class="fact-card reveal-left">
+        <h3 class="fact-card-title">Doctor Approved</h3>
+        <p class="fact-card-body">Every formula is developed with evidence-based medicine and powered by scientifically proven active ingredients, selected to deliver safe, effective and clinically supported results.</p>
+        <p class="fact-card-source">Kotiva Company Profile</p>
+      </article>
+      <article class="fact-card reveal reveal-delay-2">
+        <h3 class="fact-card-title">Made in Europe</h3>
+        <p class="fact-card-body">Manufactured in Poland using high-quality European raw materials, in compliance with stringent European Union manufacturing standards.</p>
+        <p class="fact-card-source">Kotiva Company Profile</p>
+      </article>
+      <article class="fact-card reveal-right reveal-delay-2">
+        <h3 class="fact-card-title">Built on Consistency</h3>
+        <p class="fact-card-body">The name Kotiva comes from quotidian, meaning daily. Healthy skin is built through consistent everyday care rather than occasional treatments.</p>
+        <p class="fact-card-source">Kotiva Company Profile</p>
+      </article>
+    </div>
+  </div>
+</section>

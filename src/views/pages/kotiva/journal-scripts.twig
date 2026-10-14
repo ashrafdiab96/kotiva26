@@ -1,0 +1,114 @@
+{# The reference page's @push('scripts'), verbatim except for one thing: an article that
+   carries a url (a real Salla blog post, see pages/blog/index.twig) links to it with
+   "Read article →" where the reference's teasers say "Coming soon". #}
+<script>
+let activeJournalCat = 'all';
+
+/* ── RENDER FEATURE ─────────────────────────────────────── */
+function renderFeature(article) {
+  const el = document.getElementById('feature-article');
+  if (!el) return;
+  el.innerHTML = `
+    <!-- K34: data-theme="editorial" is REQUIRED here, not decorative. This block hardcodes
+         a dark background but sits inside a light-themed page, so every design token it used
+         resolved to its LIGHT-surface value — light-theme tokens landed on a dark ground,
+         measured 2.54:1 at 32px (needs 3.0). The token system already solves this: the editorial
+         theme defines --script as gold precisely because, in its own words, "terracotta is too
+         dark on dark bg". Declaring the theme fixes every token inside this block at once rather
+         than overriding one colour and leaving the next one to fail the same way. -->
+    <div class="jf-visual-wrap" data-theme="editorial">
+      <div class="grain-overlay"></div>
+      <div class="jf-visual" aria-hidden="true">k</div>
+      ${article.image ? '<img src="' + article.image + '" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.55;z-index:0;">' : ''}
+      <div class="jf-script">${article.category}</div>
+    </div>
+    <div class="jf-content">
+      <div class="journal-cat">${article.category}</div>
+      <div class="journal-title" style="font-size:clamp(22px,2.5vw,36px);">${article.title}</div>
+      <p class="journal-excerpt" style="font-size:15px;">${article.excerpt}</p>
+      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <span style="font-family:var(--font-display);font-size:9px;font-weight:700;letter-spacing:0.2em;color:var(--fg-dim);">${article.date} · ${article.read || '4 min read'}</span>
+        ${article.url ? '<a class="journal-coming-soon" href="' + article.url + '">Read article →</a>' : '<span class="journal-coming-soon">Coming soon</span>'}
+      </div>
+    </div>`;
+}
+
+/* ── RENDER GRID ─────────────────────────────────────────── */
+function renderGrid(articles) {
+  const grid = document.getElementById('journal-main-grid');
+  if (!grid) return;
+  const items = articles.length > 1 ? articles.slice(1) : articles;
+  grid.innerHTML = items.map(a => `
+    <article class="journal-card-v" data-theme="editorial">
+      ${a.image ? '<img src="' + a.image + '" alt="" class="journal-card-img" style="width:100%;aspect-ratio:3/2;object-fit:cover;display:block;border-radius:4px 4px 0 0;margin-bottom:12px;">' : ''}
+      <div class="journal-cat">${a.category}</div>
+      <div class="journal-title">${a.title}</div>
+      <p class="journal-excerpt">${a.excerpt}</p>
+      <div class="journal-meta">
+        <span>${a.date} · ${a.read || '4 min read'}</span>
+        ${a.url ? '<a class="journal-coming-soon" href="' + a.url + '">Read article →</a>' : '<span class="journal-coming-soon">Coming soon</span>'}
+      </div>
+    </article>`).join('');
+}
+
+/* ── FILTER ──────────────────────────────────────────────── */
+function filterJournal(cat, btn) {
+  document.querySelectorAll('.jf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeJournalCat = cat;
+  const filtered = cat === 'all' ? KOTIVA.journal : KOTIVA.journal.filter(a => a.category === cat);
+  if (filtered.length) {
+    renderFeature(filtered[0]);
+    renderGrid(filtered);
+  }
+}
+
+/* ── DEEP DIVES ──────────────────────────────────────────── */
+function renderDeepDives() {
+  const grid = document.getElementById('deep-dive-grid');
+  if (!grid) return;
+  const dives = [
+    { cat: 'Ingredients', title: 'Niacinamide: The Complete Guide', read: '5 min read' },
+    { cat: 'Routines', title: 'AM vs PM Routine Order', read: '4 min read' },
+    { cat: 'Ingredients', title: 'Starting Vitamin A: The Protocol', read: '6 min read' },
+    { cat: 'Dermatology', title: 'Daily SPF: The Science', read: '3 min read' },
+  ];
+  grid.innerHTML = dives.map(d => `
+    <div class="dd-card">
+      <div class="dd-cat">${d.cat}</div>
+      <div class="dd-title">${d.title}</div>
+      <div class="dd-read journal-coming-soon">Coming soon</div>
+    </div>`).join('');
+}
+
+/* ── NEWSLETTER ──────────────────────────────────────────── */
+function handleJournalNL() {
+  const input = document.getElementById('j-email');
+  const btn = input && input.nextElementSibling;
+  if (!input || !btn) return;
+  if (!input.value || !input.value.includes('@')) {
+    input.placeholder = 'Enter a valid email';
+    input.style.outline = '1px solid rgba(215,40,47,0.85)';
+    return;
+  }
+  const originalText = btn.textContent;
+  btn.textContent = 'Subscribing…';
+  btn.disabled = true;
+  kotivaSubmitToInbox({ type: 'newsletter', email: input.value }).then(() => {
+    btn.textContent = 'Subscribed ✓';
+    btn.style.background = '#004539';
+    btn.style.color = '#fff';
+    input.disabled = true;
+  }).catch(() => {
+    btn.textContent = originalText;
+    btn.disabled = false;
+    input.placeholder = 'Something went wrong — try again';
+    input.style.outline = '1px solid rgba(215,40,47,0.85)';
+  });
+}
+
+/* ── INIT ─────────────────────────────────────────────── */
+renderFeature(KOTIVA.journal[0]);
+renderGrid(KOTIVA.journal);
+renderDeepDives();
+</script>

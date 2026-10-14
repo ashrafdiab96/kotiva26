@@ -1,0 +1,294 @@
+{#
+  KOTIVA product page body — resources/views/product/show.blade.php, 1:1 markup and the two
+  @push('styles') blocks verbatim, with Salla data:
+    • gallery: Salla's images in <salla-slider> on the reference's sticky black panel
+      (Amendment 5 — several images per product); "NN / 25" from the SKU map;
+    • price: product.price is VAT-exclusive (Salla default); the inclusive line adds 15%.
+      If the merchant switched Salla to tax-inclusive prices, the figures are derived the
+      other way round so the page still leads with the exclusive price;
+    • buy box: Salla's own form (salla.form → cart.addItem), <salla-quantity-input> and
+      <salla-add-product-button>, no quick-buy / Apple Pay (checkout still offers them);
+    • copy: the reference copy is rendered here; pdp.js replaces it from product.description
+      when that follows the reference format (Volume:/Skin type:/Concern:, Benefits,
+      How to use, Key ingredients);
+    • reviews: <salla-comments> after the Doctor Approved box (Amendment 6), behind the
+      show_reviews setting.
+  Inherited: product, store, kotiva_catalog, kotiva_copy.
+#}
+{% set sku = (product.sku ?? '')|upper|trim %}
+{% set meta = kotiva_catalog[sku] ?? null %}
+{% if not meta %}
+  {# A product whose SKU was not set in Salla: match on the name, as the customizer did. #}
+  {% set wanted = product.name|lower|replace({'kotiva ': ''})|trim %}
+  {% for p in kotiva_catalog %}{% if p.name|lower|replace({'kotiva ': ''})|trim == wanted %}{% set meta = p %}{% endif %}{% endfor %}
+{% endif %}
+{% set copy = meta ? (kotiva_copy[meta.sku] ?? null) : null %}
+
+{# Prices #}
+{% set base = product.is_on_sale ? product.sale_price : product.price %}
+{% set has_price = (base ~ '') matches '/^\\d+(\\.\\d+)?$/' %}
+{% set tax_inclusive = store.settings.tax.taxable_prices_enabled ?? false %}
+{% set price_excl = has_price ? (tax_inclusive ? base / 1.15 : base) : 0 %}
+{% set price_incl = has_price ? (tax_inclusive ? base : base * 1.15) : 0 %}
+
+{% set category = meta ? meta.category : (product.category.name ?? '') %}
+{% set volume = meta ? meta.volume : '' %}
+{% set skin_type = meta ? meta.skinType : '' %}
+{% set claim = meta ? meta.action : '' %}
+{% set fact_icons = {
+  format: '<path d="M8 2h8M9 2v4.2a6 6 0 0 0-.9 3.1V19a3 3 0 0 0 3 3h1.8a3 3 0 0 0 3-3V9.3a6 6 0 0 0-.9-3.1V2"/>',
+  zone: '<circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/>',
+  skin: '<path d="M12 3c4 4 6 6.7 6 9.6A6 6 0 0 1 6 12.6C6 9.7 8 7 12 3z"/>',
+  target: '<circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="3.4"/>',
+  size: '<path d="M4 7h16M4 17h16M7 7v10M17 7v10"/>'
+} %}
+{% set images = product.images|length ? product.images : [product.image] %}
+{% set sold_out = product.is_out_of_stock %}
+
+<style>
+.pdp-hero { padding-top: var(--nav-h); display: grid; grid-template-columns: 1fr 1fr; min-height: 88vh; }
+.pdp-gallery { position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow: hidden; background: #231F20; display: flex; align-items: center; justify-content: center; }
+.pdp-gallery-img { width: 70%; max-width: 420px; aspect-ratio: 3/4; object-fit: cover; }
+.pdp-gallery-badge { position: absolute; top: 32px; left: 32px; font-family: var(--font-display); font-size: 8px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; background: var(--bronze); color: var(--black); padding: 6px 14px; }
+/* K12: dim gallery number on the #231F20 gallery — alpha from the approved palette (docs/COLOUR-MIGRATION.md). */
+.pdp-gallery-num { position: absolute; bottom: 32px; right: 32px; font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: rgba(255,255,255,0.64); }
+.pdp-content { padding: clamp(48px, 6vw, 80px) clamp(36px, 5vw, 72px); border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 0; }
+.pdp-breadcrumb { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 28px; display: flex; gap: 12px; align-items: center; }
+.pdp-breadcrumb a { color: inherit; transition: color 0.2s; }
+.pdp-breadcrumb a:hover { color: var(--accent-text); }
+.pdp-breadcrumb-sep { color: var(--border); }
+.pdp-skin-type { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 16px; }
+.pdp-name { font-family: var(--font-display); font-size: clamp(28px, 3vw, 48px); font-weight: 900; letter-spacing: 0.03em; text-transform: uppercase; line-height: 1.0; color: var(--fg); margin-bottom: 8px; }
+.pdp-category { font-family: var(--font-display); font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 16px; }
+.pdp-price { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: 0.04em; color: var(--fg); margin-bottom: 6px; display: flex; align-items: baseline; gap: 10px; }
+.pdp-price-vat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-dim); }
+/* The inclusive price: secondary to the headline, but not a footnote — it is
+   the amount the customer will actually be charged. Takes over the margin the
+   headline price used to carry, so the block below it does not move. */
+.pdp-price-incl { font-family: var(--font-ui); font-size: 13px; letter-spacing: 0.02em; color: var(--fg-dim); margin-bottom: 28px; }
+.pdp-claim { font-family: var(--font-script); font-size: clamp(18px, 1.8vw, 28px); color: var(--script); margin-bottom: 28px; }
+.pdp-divider { height: 1px; background: var(--border); margin: 28px 0; }
+.pdp-description { font-size: 15px; line-height: 1.8; color: var(--fg-mid); font-family: var(--font-body); margin-bottom: 32px; }
+.pdp-benefits-list { list-style: none; margin: 0 0 28px; padding: 0; display: grid; gap: 10px; }
+.pdp-benefits-list li { position: relative; padding-left: 20px; font-size: 14px; line-height: 1.6; color: var(--fg-mid); font-family: var(--font-body); }
+.pdp-benefits-list li::before { content: ''; position: absolute; left: 0; top: 8px; width: 6px; height: 6px; background: var(--bronze); border-radius: 50%; }
+.pdp-ingredients-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.pdp-ingredient-pill { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; padding: 6px 14px; border: 1px solid var(--border); color: var(--accent-deep); }
+.pdp-free-from { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.pdp-free-pill { font-family: var(--font-display); font-size: 8px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; padding: 5px 12px; border: 1px solid rgba(0,69,57,0.2); color: rgba(0,69,57,0.6); }
+.pdp-how-to { background: var(--bg-card); border: 1px solid var(--border); padding: 24px 28px; margin-bottom: 32px; }
+.pdp-how-label { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 12px; }
+.pdp-how-text { font-size: 14px; line-height: 1.7; color: var(--fg-mid); font-family: var(--font-body); }
+.pdp-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.pdp-doctor-badge { margin-top: 28px; display: flex; align-items: center; gap: 16px; border: 1px solid var(--border); padding: 16px 20px; }
+.pdp-doctor-icon { font-size: 22px; flex-shrink: 0; }
+.pdp-doctor-text { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--fg-mid); line-height: 1.7; }
+.related-section { padding: var(--gap-section) 0; border-top: 1px solid var(--border); }
+.related-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: clamp(36px, 4vw, 56px); }
+@media (max-width: 1000px) {
+  .pdp-hero { grid-template-columns: 1fr; }
+  .pdp-gallery { position: relative; height: 60vw; min-height: 300px; top: 0; }
+  .pdp-content { border-left: none; border-top: 1px solid var(--border); }
+  .related-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+<style>
+/* Stock state — new for the shop, built on the existing PDP type scale. */
+.pdp-stock { display: flex; align-items: center; gap: 9px; margin-bottom: 18px; font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; }
+.pdp-stock-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.pdp-stock.is-in .pdp-stock-dot { background: #004539; }
+.pdp-stock.is-low .pdp-stock-dot { background: #EC7725; }
+.pdp-stock.is-out .pdp-stock-dot { background: var(--fg-dim); }
+.pdp-stock.is-in { color: #004539; }
+.pdp-stock.is-low { color: #EC7725; }
+.pdp-stock.is-out { color: var(--fg-dim); }
+.pdp-cod-note { font-family: var(--font-body); font-size: 13px; line-height: 1.6; color: var(--fg-dim); margin-top: 14px; }
+html[data-mode="dark"] .pdp-stock.is-in { color: #8AB7E9; }
+html[data-mode="dark"] .pdp-stock.is-in .pdp-stock-dot { background: #8AB7E9; }
+html[data-mode="dark"] .pdp-stock.is-out { color: rgba(255,255,255,0.62); }
+html[data-mode="dark"] .pdp-stock.is-out .pdp-stock-dot { background: rgba(255,255,255,0.62); }
+</style>
+
+<div id="product-{{ product.id }}" class="pdp-hero" data-kotiva-pdp data-sku="{{ meta ? meta.sku : sku }}" data-product-id="{{ product.id }}">
+  <div class="pdp-gallery">
+    <div class="grain-overlay"></div>
+    <salla-slider data-testid="store-product-image-slider" id="details-slider-{{ product.id }}" class="pdp-gallery-slider" type="default"{% if images|length > 1 %} pagination show-controls{% else %} show-controls="false"{% endif %} loop="false">
+      <div slot="items">
+        {% for image in images %}
+          <div class="swiper-slide pdp-gallery-slide">
+            <img src="{{ image.url }}" alt="{{ image.alt ?: product.name }}" class="pdp-gallery-img"{% if loop.first %} fetchpriority="high" loading="eager"{% else %} loading="lazy"{% endif %}>
+          </div>
+        {% endfor %}
+      </div>
+    </salla-slider>
+    {% if meta %}<div class="pdp-gallery-num">{{ '%02d'|format(meta.id) }} / {{ '%02d'|format(kotiva_catalog|length) }}</div>{% endif %}
+  </div>
+
+  <div class="pdp-content">
+    {% hook 'product:single.description.start' %}
+    <div class="pdp-breadcrumb">
+      <a href="{{ theme.settings.get('kotiva_url_shop') }}">Products</a>
+      <span class="pdp-breadcrumb-sep">&rarr;</span>
+      <span>{{ category }}</span>
+    </div>
+
+    <div class="pdp-skin-type" data-kotiva-field="skin">{{ skin_type }}</div>
+    <h1 class="pdp-name" data-testid="store-product-title">{{ product.name }}</h1>
+    <div class="pdp-category" data-kotiva-field="category-line" data-category="{{ category }}">{{ category }}{% if volume %} &middot; {{ volume }}{% endif %}</div>
+    {% if has_price %}
+    <div class="pdp-price"><span>SAR {{ price_excl|number_format(2, '.', ',') }}</span><span class="pdp-price-vat">excl. VAT</span></div>
+    <div class="pdp-price-incl">SAR {{ price_incl|number_format(2, '.', ',') }} including 15% VAT</div>
+    {% endif %}
+
+    {% if sold_out %}
+      <div class="pdp-stock is-out"><span class="pdp-stock-dot"></span>Sold out</div>
+    {% elseif product.quantity is not null and product.quantity > 0 and product.quantity <= 5 %}
+      <div class="pdp-stock is-low"><span class="pdp-stock-dot"></span>Only {{ product.quantity }} left</div>
+    {% else %}
+      <div class="pdp-stock is-in"><span class="pdp-stock-dot"></span>In stock</div>
+    {% endif %}
+
+    <div class="pdp-claim" data-kotiva-field="claim">{{ claim }}</div>
+
+    <div class="pdp-divider"></div>
+
+    <div data-kotiva-copy>
+      <p class="pdp-description">{{ copy ? copy.description : product.description|striptags }}</p>
+
+      {% if copy and copy.facts|length %}
+      <div class="pdp-facts" aria-label="Product at a glance">
+        {% for fact in copy.facts %}<div class="pdp-fact" data-fact="{{ fact.key }}"><svg class="pdp-fact-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ fact_icons[fact.key]|raw }}</svg><div><div class="pdp-fact-label">{{ fact.label }}</div><div class="pdp-fact-value">{{ fact.value }}</div></div></div>{% endfor %}
+      </div>
+      {% endif %}
+
+      {% if copy and copy.benefits|length %}
+      <div class="pdp-benefits" style="margin-bottom:8px;">
+        <p class="t-eyebrow" style="margin-bottom:12px; color:var(--fg-dim);">Key Benefits</p>
+        <ul class="pdp-benefits-list">{% for benefit in copy.benefits %}<li>{{ benefit }}</li>{% endfor %}</ul>
+      </div>
+      {% endif %}
+
+      {% if meta and meta.ingredients|length %}
+      <div style="margin-bottom:8px;">
+        <p class="t-eyebrow" style="margin-bottom:12px; color:var(--fg-dim);">Key Ingredients</p>
+        <div class="pdp-ingredients-list">{% for ingredient in meta.ingredients %}<span class="pdp-ingredient-pill">{{ ingredient }}</span>{% endfor %}</div>
+      </div>
+      {% endif %}
+
+      {% if copy and copy.freeFrom|length %}
+      <div class="pdp-free-from">{% for free in copy.freeFrom %}<span class="pdp-free-pill">{{ free }} Free</span>{% endfor %}</div>
+      {% endif %}
+
+      <div class="pdp-how-to">
+        <div class="pdp-how-label">How to Use</div>
+        <p class="pdp-how-text">{{ copy and copy.howToUse ? copy.howToUse : 'Apply as directed. Part of The Kotiva Standard routine.' }}</p>
+      </div>
+    </div>
+    {# Salla's description, unrendered, for pdp.js to parse (inert inside <template>). #}
+    <template id="kotiva-pdp-description">{{ product.description|raw }}</template>
+
+    {% if copy and copy.scienceHtml %}
+    <details class="pdp-science">
+      <summary><span>The Science</span><span class="pdp-science-hint">Actives &amp; clinical references</span></summary>
+      <div class="pdp-science-body">{{ copy.scienceHtml|raw }}</div>
+    </details>
+    {% endif %}
+
+    {% hook 'product:single.description' %}
+
+    <form data-testid="store-product-form" class="pdp-buy product-form" enctype="multipart/form-data" method="post"
+          onsubmit="return salla.form.onSubmit('cart.addItem', event)">
+      <input type="hidden" name="id" value="{{ product.id }}">
+      {% hook 'product:single.form.start' %}
+      {% if product.options|length %}
+        <div class="kotiva-raed pdp-options">{% include 'pages.partials.product.options' %}</div>
+      {% endif %}
+      {% hook 'product:single.form.end' %}
+
+      {% if sold_out and not product.notify_availability %}
+        <button class="btn btn-primary pdp-add" type="button" disabled>Sold out</button>
+      {% else %}
+        {% if product.is_hidden_quantity or product.type == 'booking' %}
+          <input type="hidden" value="1" name="quantity">
+        {% elseif not sold_out %}
+          <div class="pdp-qty">
+            <label class="visually-hidden" for="pdp-qty">Quantity</label>
+            <salla-quantity-input id="pdp-qty" class="pdp-qty-select" data-testid="store-product-quantity" max="{{ product.max_quantity }}" value="1" name="quantity" aria-label="Quantity"></salla-quantity-input>
+          </div>
+        {% endif %}
+        <salla-add-product-button
+            data-testid="store-product-add-to-cart"
+            class="pdp-add"
+            {{ product.is_require_shipping ? 'required-shipping' : '' }}
+            {{ product.has_preorder_campaign ? 'has-pre-order' : '' }}
+            amount="{{ product.base_currency_price }}"
+            product-status="{{ product.status }}"
+            product-type="{{ product.type }}"
+            product-id="{{ product.id }}"
+            loader-position="center"
+            type="submit"
+            width="wide"
+            {% if product.notify_availability %}
+              {{ product.notify_availability.subscribed ? 'is-subscribed' : '' }}
+              channels="{{ product.notify_availability.channels|join(',') }}"
+              subscribed-options="{{ product.notify_availability.subscribed_options|json_encode }}"
+              {{ product.notify_availability.options ? 'notify-options-availability' : '' }}
+            {% endif %}>Add to Cart</salla-add-product-button>
+      {% endif %}
+    </form>
+    {# Tabby / Tamara instalments — kept from Salla, 22px below the buy row. #}
+    <salla-installment data-testid="store-product-installment" class="pdp-installment" price="{{ product.price }}"></salla-installment>
+    {% hook 'product:single.description.end' %}
+
+    <div class="pdp-actions">
+      <a href="{{ theme.settings.get('kotiva_url_routine_finder') }}" class="btn btn-outline">Build Your Routine</a>
+    </div>
+    <p class="pdp-cod-note">Cash on delivery available.</p>
+
+    <div class="pdp-doctor-badge">
+      <div class="pdp-doctor-icon">&#9877;</div>
+      <div class="pdp-doctor-text">
+        Doctor Approved &middot; Kotiva Standard<br>
+        Formulated with clinically proven active ingredients
+      </div>
+    </div>
+
+    {% if theme.settings.get('show_reviews', true) %}
+    <section class="pdp-reviews" aria-label="Reviews and comments">
+      <div class="pdp-how-label">Reviews &amp; Comments</div>
+      <salla-comments data-testid="store-product-comments" item-id="{{ product.id }}" type="product"></salla-comments>
+    </section>
+    {% endif %}
+  </div>
+</div>
+
+{% if meta and meta.related|length %}
+<section class="related-section" data-kotiva-related="{{ meta.related|join(',') }}">
+  <div class="container">
+    <div class="section-header-row">
+      <div>
+        <p class="t-eyebrow" style="margin-bottom:12px;">You May Also Need</p>
+        <h2 class="t-title">COMPLETE YOUR<br>ROUTINE</h2>
+      </div>
+      <a href="{{ theme.settings.get('kotiva_url_shop') }}" class="btn-text-light">View All &rarr;</a>
+    </div>
+    <div class="related-grid">
+{% for rsku in meta.related|slice(0, 4) %}{% set rel = kotiva_catalog[rsku] %}
+        <a class="product-card" href="{{ link(rel.salla.path|trim('/', 'left')) }}" data-kotiva-sku="{{ rel.sku }}" data-sku="{{ rel.sku }}" style="border:none;">
+          <div class="product-card-img">
+            <img src="{{ ('kotiva/' ~ rel.image)|asset }}" alt="{{ rel.displayName }}" loading="lazy">
+          </div>
+          <div class="product-card-body">
+            <div class="product-card-name">{{ rel.displayName }}</div>
+            <div class="product-card-desc">{{ rel.category }} &middot; {{ rel.skinType }}</div>
+            <div class="product-card-price" data-kotiva-price>SAR&nbsp;<small>excl. VAT</small></div>
+            <div class="product-card-footer"><span class="badge-concern">{{ rel.concern }}</span><span class="product-card-cta">Discover</span></div>
+          </div>
+        </a>
+{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<div class="s-blocks-wrapper s-after-related">{% hook 'product.single.after_product_recommendations' %}</div>

@@ -1,217 +1,187 @@
-<div id="top"></div>
-<br />
-<div align="center"> 
-  <a href="https://salla.dev"> 
-    <img src="https://salla.dev/wp-content/uploads/2023/03/1-Light.png" alt="Logo"> 
-  </a>
-  <h1 align="center">Theme Raed</h1>
-  <p align="center">
-    Theme Raed is the starting point for developing Themes for Salla Stores. 
-    <br />
-    <a href="https://salla.dev/"><strong>Explore our blogs »</strong></a>
-    <br />
-    <a href="https://github.com/SallaApp/theme-raed/issues/new">Report Bug</a> · 
-    <a href="https://github.com/SallaApp/theme-raed/discussions/new">Request Feature</a> . <a href="https://t.me/salladev">&lt;/Salla Developers&gt;</a> . <a href="https://docs.salla.dev/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM">Official Documentation</a> 
-  </p>
-</div>
+# KOTIVA — Salla theme
 
+The KOTIVA website, rebuilt as a Salla Twilight theme (based on [Theme Raed](https://github.com/SallaApp/theme-raed)).
+The entire site runs on the Salla store: home, shop, product pages, cart, About, Science, Journal,
+Contact, Ingredient Glossary, Routine Finder, Privacy and Terms. Salla's hosted checkout and payments
+are untouched. The reference is the Laravel site in `../website`. Its look, copy and behaviour are
+ported 1:1, and its CSS, JS, fonts and images are shipped byte-for-byte.
 
-<!-- TABLE OF CONTENTS -->
-<details open>
-  <summary>Table of Contents</summary>
-<ol>
-<li><a  href="#overview">Overview</a></li>
-<li><a  href="#getting-started">Getting Started</a>
-<ul>
-<li><a  href="#prerequisite">Prerequisite</a></li>
-<li><a  href="#install">Installation</a></li>
-</ul>
-</li>
-<li>
-<a  href="#usage">Usage</a>
-<ul>
-<li><a  href="#directory-structure">Directory Structure</a></li>
-<li><a  href="#theme-preview">Theme Preview</a></li>
-</ul>
-</li>
-<li>
-<a  href="#main-features">Main Features</a>
-<ul>
-<li><a  href="#theme-features">Theme Features</a></li>
-<li><a  href="#theme-components">Theme Components</a></li>
-</ul>
-</li>
-<li><a  href="#support">Support</a></li>
-<li><a  href="#contributing">Contributing</a></li>
-<li><a  href="#credits">Credits</a></li>
-<li><a  href="#license">License</a></li>
-</ol>
-</details>
+- **What maps to what:** [`docs/PORT-MAP.md`](docs/PORT-MAP.md)
+- **Every judgement call, with reasons:** [`docs/DECISIONS.md`](docs/DECISIONS.md)
 
-<br>
+---
 
-## Overview
-Theme Raed is the starting point for developers to design themes for merchant stores that reflect the uniqueness of each store on the [Salla Platform](https://s.salla.sa). Custom themes will make it much easier for developers to tailor the merchant's store to its changing demands over time. It shipped as the default theme along with the [Twilight Themes](https://docs.salla.dev/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM), which is the Salla themes engine for developers to create customizable themes to be used on the [Salla Platform](https://salla.sa/site/).
-  
-## Getting Started 
-Developers can use Salla Theme Raed to not only design Salla themes with custom HTML/CSS/JS files and reusable custom UI components, but also to build custom actions that trigger JS events and hooks.
+## 1. Build
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+`pnpm` only (enforced). Node `^22.18` or `>=24.11`.
 
-### Prerequisite  
-- Basic understanding of HTML, CSS, JS, and the [Twig Template Engine](https://twig.symfony.com/).
-- Partner account at [Salla Partners Portal](https://salla.partners/) to create a demo store to publish and test your theme.
-- A [Github](https://github.com) account into which the theme can be synced.
-- Installing [Salla CLI](https://www.npmjs.com/package/@salla.sa/cli)
-
-### Install  
-Theme Raed gets installed by default upon installing the Twilight Themes. Twilight can be installed in two ways:
-
-- Through the [Salla Partners Portal](https://docs.salla.dev/doc-421877/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM#creating-theme-via-salla-partners-portal)
-
-- Through the [Salla CLI](https://docs.salla.dev/doc-422775/?nav=01HNA8QHCPJTCY5VSEZ616JCAK).
-
-Either way, it will trigger the installation of the Twilight Engine and the Theme Raed.  This a complete article for how to [install and create](https://docs.salla.dev/doc-421877/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM) the Twilight Themes.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-## Usage 
-Theme Raed will be installed as the default theme when you install Twilight. We'll look at how this theme's directories are set up and how to use the preview mode in the next section.
-
-### Directory structure  
-**Theme Raed** is a collection of files and folders that define the Salla Store presentation layer. Following is the directory structure for this starter theme.
-```shell
-+---scr
-    +---assets
-    |   +---images      
-    |   +---js      
-    |   +---styles         
-    +---locales
-    |       ar.json
-    |       en.json
-    +---views
-        +---components
-        |   +---footer
-        |   +---header
-        |   +---home
-        |   +---product
-        |   comments.twig
-        +---layouts
-        |       master.twig
-        +---pages
-            |   cart.twig
-            |   index.twig
-            |   loyalty.twig
-            |   page-single.twig
-            |   thank-you.twig
-            +---blog
-            |       index.twig
-            |       single.twig 
-            +---brands
-            |       index.twig
-            |       single.twig 
-            +---customer
-               |   notifications.twig
-               |   profile.twig
-               |   wishlist.twig
-               +---orders
-               |      index.twig
-               |      single.twig
-            +---partials
-                |   single-comment.twig
-                +---product
-                  |   card-full-image.twig
-                  |   card-mini.twig
-                  |   card.twig
-                  |   options.twig
-                  |   slider.twig
-            +---product
-            |       index.twig
-            |       single.twig
+```bash
+pnpm install                         # also records @playwright/test in pnpm-lock.yaml (T-12)
+pnpm run watch                       # development build, rebuilds on change
+pnpm run production                  # what gets published
+pnpm check                           # every gate (see §6)
+pnpm test                            # Routine Finder engine (18 invariants, offline)
 ```
 
-### Theme Preview  
-Using [Salla CLI](https://github.com/SallaApp/Salla-CLI), the developer can preview the theme as they are being developed.  The `preview` command helps the developer to get a look at the theme in live mode.
+Reference data is copied and generated by two scripts. Run them only after the reference site
+changes:
 
-<!-- theme: info -->
-> To run the preview command, the developer must be in the theme's root folder.
-
-The developer can run the command `preview` and specify the configuration to view the theme:
-
-```shell title = "Terminal"
-salla theme preview
-
-# Alias command for preview
-salla theme p
+```bash
+node scripts/sync-reference.mjs                                   # CSS/JS/fonts/images → src/assets/kotiva (verbatim)
+node scripts/export-reference-data.mjs --php /path/to/php         # catalog, product copy, science, glossary
+node scripts/validate-palette.mjs --record-reference-debt         # only if the reference's own CSS changed
 ```
 
-On the other hand, the [Partners Portal]() lists the demo stores of the developer. The developer may select a demo store where the theme will be installed, after which the store will be instantly shown in the browser. This is a fantastic option for developers who want to see live updates to their themes appearing on the store right away.
+`--php` needs PHP 8.2 or later **with mbstring**. It runs the reference's own `ScienceRenderer`.
+On the dev machine, WSL's php lacks mbstring, so use XAMPP's: `--php /mnt/c/xampp/php/php.exe`.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+## 2. Preview and publish (Salla CLI)
 
-## Main Features 
-By default, Theme Raed home page displays a collection of Pre-Defined and Custom Components. These components are located in the [`src/views/components/home/`](https://github.com/SallaApp/theme-raed/tree/master/src/views/components/home) folder.
+```bash
+salla login                          # once
+salla theme preview                  # builds, watches, and opens a preview of this theme on the store
+salla theme publish                  # uploads a new version to Salla Partners
+```
 
+**Publish privately first.** In Salla Partners, keep the new version private and preview it on
+the store, using the checklist in §5. Only then make it live in the store's dashboard
+(Store design → Themes).
 
-### Theme Features  
- Pre-Defined  Components, which are know as Theme Features, listed in the [twilight.json](https://github.com/SallaApp/theme-raed/blob/master/twilight.json) under the `features` section. Below is a list of these components.
- 
- | <div style="width:220px">Component</div>                                                       | Discription                                                                                                                                                                 |
- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
- | [Youtube](https://docs.salla.dev/doc-422582/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)                   | This component is responsible for displaying Youtube videos that the developer preselects.                                                                                  |
- | [Fixed Banner](https://docs.salla.dev/doc-422583/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)              | Fixed banner is the area in charge of displaying a banner that is fixated on the home page.                                                                                 |
- | [Testimonials](https://docs.salla.dev/doc-422584/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)              | This component displays testimonials that the developer preselects.                                                                                                         |
- | [Parallax backgorund](https://docs.salla.dev/doc-422585/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)       | This component displays products with a backgournd that zooms out slowly giving a 2D effect.                                                                                |
- | [Photos slider](https://docs.salla.dev/doc-422586/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)             | Photos are displayed in a slider by using this component.                                                                                                                   |
- | [Store Features](https://docs.salla.dev/doc-422587/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)            | This component is responsible for showcasing the store features such as a detailed product description, customer reviews of the product, and a fast guest check-out option. |
- | [Square photos](https://docs.salla.dev/doc-422588/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)             | Use this component to display photos in a square shape.                                                                                                                     |
- | [Fixed products](https://docs.salla.dev/doc-422589/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)            | Use this component to pin the products that you wish to have displayed always.                                                                                              |
- | [Products slider](https://docs.salla.dev/doc-422590/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)           | This slider component helps navigate between products vertically/horizontally.                                                                                              |
- | [Featured prodcuts style 1](https://docs.salla.dev/doc-422591/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM) | Using this component, featured products are exhibited in a pre-defined style.                                                                                               |
- | [Featured prodcuts style 2](https://docs.salla.dev/doc-422592/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM) | Using this component, featured products are exhibited in a pre-defined style.                                                                                               |
- | [Featured prodcuts style 3](https://docs.salla.dev/doc-422593/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM) | Using this component, featured products are exhibited in a pre-defined style.                                                                                               |
- | [Latest Products](https://docs.salla.dev/doc-422599/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)           | This component displays the latest products added to the store automatically.                                                                                               |
- | [Vertical menu with slider](https://docs.salla.dev/doc-422600/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM) | Used to display a menu for a group of the sub-pages' links in a vertical menu.                                                                                              |
+**Rolling back.** The current live theme is **"Kotiva Production – BACKUP"**. To roll back,
+re-activate it from the store's theme list. Salla keeps the previously installed theme there,
+and its settings stay intact. Do not delete it until the KOTIVA theme has been live and checked
+for a while.
 
-### Theme Components
-The Custom Components can be easily modified by the developer. They are known as Theme Components. Below is the list of the Custom Components that are shipped by default along with Theme Raed.
+## 3. Salla pages to create
 
-| Components                                                                                       | Description                                                                                      |
-| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| [Brands](https://docs.salla.dev/doc-422594/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)                      | Brands' logos of the store are displayed in this component section.                              |
-| [Enhanced Squared Image](https://docs.salla.dev/doc-422595/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)      | Enhanced images in a square shape are displayed with the help of this component.                 |
-| [Main links](https://docs.salla.dev/doc-422596/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)                  | This component helps to portray the store main links.                                            |
-| [Enhanced Slider](https://docs.salla.dev/doc-422597/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM)             | The slider component helps navigate vertically/horizontally.                                     |
-| [Slider products with header](https://docs.salla.dev/doc-422598/?nav=01HNFTD5Y5ESFQS3P9MJ0721VM) | Slider products with header displays the products in a slide and give the sldier a header title. |
+Store dashboard → **Pages** → create one page per row. **Title** is the title to use. The page
+body can be empty: the theme renders the KOTIVA design. After saving, open the page and copy its
+id, the number after `page-` in the URL (e.g. `/about/page-1085608773` → `1085608773`). Paste it
+into **Theme settings → KOTIVA pages**.
 
+| Page | Title (suggested) | Theme setting | SEO title | SEO description |
+|---|---|---|---|---|
+| About | About | About page | About — kotiva™ | The story behind kotiva™ — doctor-approved skincare perfected by science and built for visible results. |
+| Science | Science | Science page | Our Science — kotiva™ | The clinical science behind kotiva™. Ingredient selection, formulation philosophy, and the clinical rationale behind every active. |
+| Contact / Where to Buy | Contact | Contact / Where to Buy page | Contact & Where to Buy — kotiva™ | Find kotiva™ stockists across the MENA region, get in touch with our support team, or ask a question about any product in the 25-piece collection. |
+| Ingredient Glossary | Ingredients | Ingredient Glossary page | Ingredient Glossary — kotiva™ | A plain-language reference to the key active ingredients in KOTIVA skincare — what each active is and what it does for your skin. |
+| Routine Finder | Routine Finder | Routine Finder page | Routine Finder — kotiva™ | Find your perfect kotiva™ skincare routine. Answer a few questions about your skin type and concerns. |
+| Privacy Policy | Privacy Policy | Privacy Policy page | Privacy Policy (Draft) — kotiva™ | How kotiva™ (Vitakode LLC) collects, uses, and protects your personal data. Draft template pending legal review. |
+| Terms | Terms | Terms of Use page | Terms & Conditions (Draft) — kotiva™ | The terms and conditions governing your use of the kotiva™ (Vitakode LLC) website. Draft template pending legal review. |
 
-## Support
+If the id is not pasted, a page is still recognised when its body is just the marker
+`kotiva:<slug>` (`kotiva:about`, `kotiva:routine-finder`, …), or when its URL contains the slug.
+The nav and footer links need the id (or the full page URL) in Theme settings, though; until
+then they point at the store home.
 
-The team is always here to help you. Happen to face an issue? Want to report a bug? You can submit one here on Github using the [Issue Tracker](https://github.com/SallaApp/theme-raed/issues/new). If you still have any questions, please contact us via the [Telegram Bot](https://t.me/SallaSupportBot) or join in the Global Developer Community on [Telegram](https://t.me/salladev).
+**Home and Journal need no page.** Home is the store root, set its SEO in the store's SEO
+settings to: *kotiva™ — Doctor-Approved Skincare* / *Doctor-approved skincare, perfected by
+science and tailored for you. Explore 25 products formulated with clinically proven ingredients
+across cleansers, serums, SPF, body and hair care.* The Journal is Salla's blog at `/blog`; until
+blog posts exist it shows the original "Coming soon" journal. Tag posts Ingredients / Routines /
+Dermatology / Education / Brand. **Shop** is `/latest-products`.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+**Products:** each Salla product's **SKU** must be its KOTIVA code (`KOT001` … `KOT025`). That
+is how the theme finds its category, skin type, concern, science text and related products. The
+description may follow the original format (`Volume:` / `Skin type:` / `Concern:` lines, then
+`Benefits`, `How to use`, `Key ingredients` headings). The product page then shows the Salla
+text; otherwise it shows the original copy.
 
-## Contributing
+## 4. Theme settings to fill
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create.
-Any contributions you make are **greatly appreciated**.
+Store dashboard → Store design → the KOTIVA theme → **Settings**:
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request.
-You can also simply open an issue with the tag "enhancement". Don't forget to give the project a star! Thanks again!
+| Group | Setting | What to enter |
+|---|---|---|
+| KOTIVA pages | About … Terms (7) | The page ids from §3 |
+| Announcement bar | Show the announcement bar + text | Optional. Shown only when enabled **and** the text is not empty |
+| Links | "Where to Buy" link | Optional. Empty = the Contact page |
+| Links | Company profile (PDF) link | Optional. Empty = the PDF shipped with the theme |
+| Links | Instagram / TikTok / Facebook URL | Empty = "Coming soon" icons. A URL makes that icon a link |
+| Forms | Newsletter form endpoint | POST URL of the email tool that should receive sign-ups (JSON `{email, source}`) |
+| Forms | Contact form endpoint | POST URL that should receive contact messages (JSON `{name, email, enquiry_type, message}`) |
+| Home hero | Slide 1/2 — desktop/mobile | Optional. Empty = the original campaign artwork |
+| Routine Finder | 4 skin-type + 8 concern images | Optional. Empty = the original images |
+| Product page | Show customer reviews | On by default |
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+With no form endpoints, both forms open the visitor's email app addressed to the store email
+(Store settings → contact email), so nothing is lost.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+Home sections are Salla home components (**KOTIVA · Hero**, **KOTIVA · Marquee**, …). A fresh
+install shows all twelve in the original order.
 
-## Credits
-- [Salla](https://github.com/sallaApp)
-- [All Contributors](../../contributors)
-<p align="right">(<a href="#top">back to top</a>)</p>
+## 5. Preview checklist (what you should see)
 
-## License
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-<p align="right">(<a href="#top">back to top</a>)</p>
+1. **Every page:** the KOTIVA nav, which turns transparent over the hero and hides on scroll down.
+   Also the light/dark toggle, which persists across pages, and the KOTIVA footer. At 390px, the
+   hamburger opens the full-screen overlay; Tab stays inside it and Esc closes it.
+2. **Home:** the campaign slider, then the marquee and the rest of the sections down to the
+   newsletter. The best-sellers rail links to Salla product pages.
+3. **Shop** (`/latest-products`): the purple hero, the 10 filter pills with counts, the sort row,
+   15 cards and then "Load more (10)".
+   - `?filter=spf` pre-selects SPF.
+   - `/?routine=KOT001,KOT005` lands on the listing showing those two with the notice.
+   - Both survive a refresh.
+   - "Add to cart" adds to the Salla cart, and the nav badge counts up.
+4. **Product page:** the sticky black gallery with Salla's images and "SAR x.xx EXCL. VAT" above
+   the VAT-inclusive line. Then the spec grid, benefits, ingredients, how-to and The Science
+   (closed by default).
+   - The quantity stepper and black Add to Cart sit on one row; Tabby/Tamara instalments follow,
+     22px below the buy row.
+   - Then Build Your Routine, the COD note, the Doctor Approved box, reviews, and "Complete your
+     routine" (4 cards).
+5. **Cart:** the KOTIVA list and summary. Proceed to Checkout opens Salla's checkout.
+6. **Routine Finder:** the 7 steps, with images on steps 2 and 4. The result links go to Salla
+   product pages, and "Shop These Products" lands on the routine listing.
+7. **About / Science / Contact / Glossary / Privacy / Terms / Journal:** identical to the original
+   site. Glossary product links open Salla product pages.
+
+## 6. Quality gates
+
+```bash
+pnpm run production
+pnpm check            # = the five below
+node scripts/sync-reference.mjs --check        # verbatim copies still byte-identical to the reference
+node scripts/validate-palette.mjs              # only approved KOTIVA colours/alphas (+ recorded reference debt)
+node scripts/check-class-collisions.mjs        # Raed's CSS does not reach KOTIVA markup
+node scripts/check-urls.mjs                    # no hard-coded klyvosystems.com / kotiva.co / localhost
+node tests/routine-engine.test.mjs             # Routine Finder engine invariants
+```
+
+End-to-end and visual regression need a browser and the preview URL. Install Chromium once with
+`pnpm exec playwright install chromium`.
+
+```bash
+# Routine Finder e2e (desktop + 390px): quiz → links to /p<salla id>
+KOTIVA_ROUTINE_URL="<preview URL of the Routine Finder page>" pnpm test:e2e
+
+# Visual regression: copy scripts/visual-pages.example.json → scripts/visual-pages.json and fill
+# in the theme paths (page ids), then:
+KOTIVA_REF_URL=http://localhost:8000 KOTIVA_REF_STORE_URL=https://shop.klyvosystems.com \
+  node scripts/screenshot-pages.mjs --label reference      # capture BEFORE publishing the theme
+KOTIVA_THEME_URL="<preview URL>" node scripts/screenshot-pages.mjs --label theme
+node scripts/compare-screenshots.mjs                       # → docs/VISUAL-REGRESSION.md
+```
+
+The reference capture of the shop pages must be taken from the live store while it still runs
+the old customizer, i.e. before this theme goes live.
+
+## 7. Layout of the code
+
+```
+src/assets/kotiva/          verbatim reference assets (never edit; scripts/sync-reference.mjs)
+src/assets/kotiva-theme/    the theme's own KOTIVA code: js/, css/kotiva-salla.css, data/ (generated)
+src/views/layouts/master.twig            KOTIVA layout (Raed hooks kept)
+src/views/components/header|footer/      KOTIVA nav + overlay, footer
+src/views/components/home/kotiva-*.twig  home sections (Salla home components)
+src/views/components/kotiva/             urls, generated data/copy, listing, PDP, cart, article
+src/views/pages/kotiva/                  About, Science, Contact, Glossary, Routine Finder, Privacy, Terms
+src/views/pages/page-single.twig         Salla page → KOTIVA page dispatch
+src/views/pages/{index,cart,product/*,blog/*}.twig
+scripts/                    sync, export, gates, screenshot tooling
+tests/                      engine test, Playwright e2e
+```
+
+Raed's customer area, loyalty, brands, testimonials and thank-you pages are kept as Raed built
+them, inside the KOTIVA chrome (`body.kotiva-raed`). For Raed's own documentation see
+<https://docs.salla.dev>.

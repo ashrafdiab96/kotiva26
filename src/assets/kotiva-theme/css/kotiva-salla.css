@@ -1,0 +1,173 @@
+/* ============================================================
+   KOTIVA × Salla — adaptation layer.
+
+   Loaded after Raed's app.css and the verbatim kotiva.css + shop.css. It introduces NO
+   new colours, type sizes or spacing values: every value is a KOTIVA token from kotiva.css
+   or a literal already used there (the palette gate checks this file too). Its only jobs:
+     • give Salla's web components (all light DOM) the KOTIVA look;
+     • seat Raed's surviving pages (customer area, thank-you, …) under the fixed KOTIVA nav;
+     • neutralise the few Raed rules that still reach KOTIVA markup.
+   ============================================================ */
+
+/* ── Raed pages inside the KOTIVA chrome ─────────────────────────────── */
+/* The KOTIVA nav is fixed; KOTIVA pages offset themselves (hero padding-top: var(--nav-h)),
+   Raed's pages never had to. */
+body.kotiva-raed #main-content {
+  padding-top: var(--nav-h);
+  padding-bottom: var(--section-pad);
+  background: var(--bg);
+}
+body.kotiva-raed #main-content .container {
+  width: auto;
+}
+/* Raed's content cards are white boxes on a grey page; KOTIVA pages are white, so the cards
+   take KOTIVA's hairline border instead of a contrast change. */
+body.kotiva-raed #main-content .bg-white {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+/* Typography: Raed's pages take KOTIVA's type families. */
+body.kotiva-raed #main-content h1,
+body.kotiva-raed #main-content h2,
+body.kotiva-raed #main-content h3 {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+body.kotiva-raed #main-content {
+  font-family: var(--font-body);
+  color: var(--fg);
+}
+html[data-mode="dark"] body.kotiva-raed #main-content {
+  color: var(--fg);
+}
+
+/* ── Salla buttons wearing reference classes ─────────────────────────────
+   salla-adopt.js puts the reference's own classes (.product-card-add-btn, .btn .btn-primary)
+   on Salla's inner <button>; kotiva.css / shop.css style it from there. These rules only
+   make Salla's wrappers (host > div > salla-button) behave like the reference's bare
+   <button>: full width of their slot and clickable. */
+.product-card-add salla-add-product-button,
+.product-card-add salla-add-product-button > div,
+.product-card-add salla-button,
+.pdp-buy salla-add-product-button > div,
+.pdp-buy salla-add-product-button salla-button {
+  display: block;
+  width: 100%;
+}
+salla-add-product-button salla-button.s-button-wrap { pointer-events: auto; }
+.product-card-add-btn.s-button-element,
+.pdp-buy .btn.s-button-element { width: 100%; line-height: normal; }
+.product-card-add-btn.s-button-element:hover,
+.pdp-buy .btn.s-button-element:hover { opacity: 1; }
+.product-card-add-btn .s-button-loader::before,
+.pdp-buy .btn .s-button-loader::before { border-top-color: currentColor; border-left-color: currentColor; }
+
+/* ── Listing: "Load more" and the empty state (customizer V6 behaviour) ── */
+.kotiva-load-more { display: flex; justify-content: center; }
+.kotiva-load-more .btn { margin-top: 42px; }
+.kotiva-load-more .btn[hidden],
+.kotiva-listing-empty[hidden] { display: none; }
+.kotiva-listing-empty {
+  margin: 30px auto 0;
+  padding: 35px;
+  text-align: center;
+}
+
+/* ── PDP gallery: <salla-slider> on the reference's sticky black panel ────
+   One slide per Salla image, each centred like the reference's single .pdp-gallery-img. */
+.pdp-gallery salla-slider.pdp-gallery-slider {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.pdp-gallery-slider .s-slider-container,
+.pdp-gallery-slider .swiper,
+.pdp-gallery-slider .swiper-wrapper,
+.pdp-gallery-slider [slot="items"] {
+  width: 100%;
+  height: 100%;
+}
+.pdp-gallery-slider .s-slider-block__title { display: none; }
+.pdp-gallery-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.pdp-gallery-slider .swiper-pagination-bullet { background: var(--k-white); opacity: 0.4; }
+.pdp-gallery-slider .swiper-pagination-bullet-active { opacity: 1; }
+.pdp-gallery-slider .s-slider-nav-arrow,
+.pdp-gallery-slider .s-slider-prev,
+.pdp-gallery-slider .s-slider-next { color: var(--k-white); }
+.pdp-gallery .pdp-gallery-num { z-index: 2; }
+
+/* ── PDP quantity: <salla-quantity-input> as the reference's pill (.pdp-qty-select on
+   the host; shop.css styles the pill, these rules clear Salla's own boxes inside it). */
+salla-quantity-input.pdp-qty-select {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px;
+}
+.pdp-qty-select .s-quantity-input-container {
+  display: flex;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  height: auto;
+}
+.pdp-qty-select .s-quantity-input-input {
+  width: 40px;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  color: inherit;
+  box-shadow: none;
+}
+.pdp-qty-select .s-quantity-input-button {
+  width: 32px;
+  height: 46px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pdp-qty-select .s-quantity-input-button svg { width: 12px; height: 12px; fill: currentColor; }
+
+/* ── PDP buy row extras ─────────────────────────────────────────────── */
+.pdp-buy salla-add-product-button.pdp-add { display: block; }
+.pdp-options { flex: 1 0 100%; }
+salla-installment.pdp-installment { display: block; margin-top: 22px; }
+
+/* ── PDP reviews (Amendment 6): Salla's comments in the KOTIVA type system ── */
+.pdp-reviews {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.pdp-reviews salla-comments {
+  display: block;
+  font-family: var(--font-body);
+  color: var(--fg-mid);
+}
+.pdp-reviews salla-comments h1,
+.pdp-reviews salla-comments h2,
+.pdp-reviews salla-comments h3,
+.pdp-reviews salla-comments h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+/* ── Cart: Salla's checkout button and coupons in the summary column ──── */
+.cart-summary salla-button.cart-checkout,
+.cart-summary salla-button.cart-checkout button { display: block; width: 100%; }
+.cart-summary salla-button.cart-checkout.s-button-wrap { pointer-events: auto; }
+.cart-summary .cart-checkout .btn.s-button-element { width: 100%; line-height: normal; }
+.cart-summary .cart-checkout .btn.s-button-element:hover { opacity: 1; }
+.cart-summary salla-cart-coupons { display: block; margin: 0 0 16px; }
+.cart-item-qty salla-quantity-input.pdp-qty-select { min-height: 44px; }

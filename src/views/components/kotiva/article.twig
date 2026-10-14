@@ -1,0 +1,73 @@
+{#
+  Long-form KOTIVA page: the reference's legal-page layout (privacy-policy.blade.php's hero and
+  .legal-content column; its style block is repeated here verbatim) for content the reference
+  had no page for — Salla blog posts. Parameters: eyebrow, title, meta, image, body (HTML),
+  back_url, back_label.
+#}
+<style>
+.legal-hero {
+  padding-top: calc(var(--nav-h) + 80px);
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--border);
+}
+.draft-banner {
+  background: var(--bg-alt);
+  border: 1px solid var(--border-strong);
+  padding: 20px 24px;
+  margin-top: 28px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg-mid);
+  max-width: 640px;
+}
+.draft-banner strong { color: var(--fg); }
+.legal-content { padding: var(--gap-section) 0; }
+.legal-content-inner { max-width: 760px; margin: 0 auto; }
+.legal-content-inner h2 {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin: 48px 0 16px;
+}
+.legal-content-inner h2:first-child { margin-top: 0; }
+.legal-content-inner p, .legal-content-inner li {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--fg-mid);
+  font-family: var(--font-body);
+  margin-bottom: 16px;
+}
+.legal-content-inner ul { padding-left: 20px; margin-bottom: 16px; }
+.legal-content-inner li { margin-bottom: 8px; }
+.legal-content-inner a { color: var(--accent-deep); text-decoration: underline; }
+.legal-meta {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-bottom: 32px;
+}
+</style>
+  <header class="legal-hero">
+    <div class="container">
+      <p class="t-eyebrow reveal" style="margin-bottom:16px;">{{ eyebrow }}</p>
+      <h1 class="t-display reveal reveal-delay-1" style="margin-bottom:0;">{{ title }}</h1>
+    </div>
+  </header>
+
+  <section class="legal-content">
+    <div class="container">
+      <div class="legal-content-inner reveal">
+        {% if meta %}<p class="legal-meta">{{ meta }}</p>{% endif %}
+        {% if image %}<img src="{{ image }}" alt="" style="width:100%;aspect-ratio:3/2;object-fit:cover;margin-bottom:32px;">{% endif %}
+        {{ body|raw }}
+        {% if back_url %}<p style="margin-top:48px;"><a href="{{ back_url }}">{{ back_label }}</a></p>{% endif %}
+      </div>
+    </div>
+  </section>

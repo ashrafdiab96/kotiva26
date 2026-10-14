@@ -9,7 +9,9 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node tests/routine-engine.test.mjs",
+    "test:e2e": "playwright test",
+    "check": "node scripts/sync-reference.mjs --check && node scripts/validate-palette.mjs && node scripts/check-class-collisions.mjs && node scripts/check-urls.mjs && node tests/routine-engine.test.mjs",
     "production": "webpack --mode production",
     "prod": "webpack --mode production",
     "development": "webpack --mode development",
@@ -28,6 +30,7 @@
     "@babel/core": "^8.0.1",
     "@babel/plugin-transform-runtime": "^8.0.1",
     "@babel/preset-env": "^8.0.2",
+    "@playwright/test": "1.56.1",
     "@salla.sa/twilight": "^2.14.551",
     "@salla.sa/twilight-components": "^2.14.551",
     "@tailwindcss/forms": "^0.5.11",

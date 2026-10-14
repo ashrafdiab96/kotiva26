@@ -1,0 +1,610 @@
+{#
+  KOTIVA Routine Finder — resources/views/pages/routine-finder.blade.php ported 1:1: the same
+  seven steps, markup, styles (verbatim below), transitions and result layout.
+  Step images come from Theme settings (routine_skin_* / routine_concern_*), falling back to
+  the original files. Scripts: routine-finder-pre-scripts.twig (catalog bridge + the
+  unchanged engine and model) and routine-finder-scripts.twig (the page controller).
+#}
+{% set quiz = {
+  skin_oily: theme.settings.get('routine_skin_oily') ?: 'kotiva/img/quiz/skin-oily.webp'|asset,
+  skin_dry: theme.settings.get('routine_skin_dry') ?: 'kotiva/img/quiz/skin-dry.webp'|asset,
+  skin_combination: theme.settings.get('routine_skin_combination') ?: 'kotiva/img/quiz/skin-combination.webp'|asset,
+  skin_balanced: theme.settings.get('routine_skin_balanced') ?: 'kotiva/img/quiz/skin-balanced.webp'|asset
+} %}
+<style>
+.rf-hero {
+  padding-top: calc(var(--nav-h) + 72px);
+  padding-bottom: 72px;
+  border-bottom: 1px solid var(--border);
+}
+/* QUIZ UI */
+.quiz-section { padding: var(--gap-section) 0; }
+.quiz-wrap { max-width: 860px; margin: 0 auto; }
+.quiz-step { display: none; }
+.quiz-step.active { display: block; }
+
+.quiz-progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 48px;
+}
+.quiz-progress-dot {
+  height: 2px;
+  flex: 1;
+  background: var(--border);
+  transition: background 0.4s;
+}
+.quiz-progress-dot.done { background: var(--bronze); }
+.quiz-progress-dot.active { background: var(--off-white); }
+
+.quiz-step-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  margin-bottom: 16px;
+}
+.quiz-question {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 44px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+.quiz-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.64);
+  margin-bottom: 44px;
+  font-family: var(--font-body);
+}
+.quiz-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 40px;
+}
+.quiz-option {
+  padding: 24px 28px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: transparent;
+  text-align: left;
+}
+.quiz-option:hover {
+  border-color: var(--bronze);
+  background: rgba(138,183,233,0.25);
+}
+.quiz-option.selected {
+  border-color: var(--bronze);
+  background: rgba(138,183,233,0.25);
+}
+.quiz-option-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--off-white);
+}
+.quiz-option-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.64);
+  line-height: 1.5;
+  font-family: var(--font-body);
+}
+.quiz-option.selected .quiz-option-title { color: var(--accent-text); }
+.quiz-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.quiz-back {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.64);
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: color 0.2s;
+}
+.quiz-back:hover { color: var(--off-white); }
+/* RESULT */
+.result-section { display: none; padding: var(--gap-section) 0; }
+.result-section.visible { display: block; }
+.result-header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 64px;
+}
+.result-routine-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--border);
+  margin-bottom: 60px;
+}
+.result-time-block { background: var(--black); }
+.result-time-label {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.result-time-icon {
+  width: 24px; height: 24px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+.result-steps { padding: 8px 0; }
+.result-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.result-step:last-child { border-bottom: none; }
+.result-step:hover { background: var(--bg-alt); }
+.result-step-num {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--accent-deep);
+  flex-shrink: 0;
+  min-width: 28px;
+  margin-top: 2px;
+}
+.result-step-label {
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.64);
+  margin-bottom: 4px;
+}
+.result-step-product {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  line-height: 1.2;
+}
+.result-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.result-retake {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.64);
+  border-bottom: 1px solid rgba(255,255,255,0.18);
+  padding-bottom: 3px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s;
+}
+.result-retake:hover { color: var(--off-white); }
+@media (max-width: 680px) {
+  .quiz-options { grid-template-columns: 1fr; }
+  .result-routine-grid { grid-template-columns: 1fr; }
+}
+/* THEME-AWARE CONTRAST FIX (light + dark) */
+.quiz-question{color:var(--fg);}
+.quiz-sub{color:var(--fg-mid);}
+.quiz-option{background:var(--bg-card);color:var(--fg);}
+.quiz-option-title{color:var(--fg);}
+.quiz-option-desc{color:var(--fg-mid);}
+.quiz-option.selected .quiz-option-title{color:var(--accent-text);}
+.quiz-progress-dot.active{background:var(--fg);}
+.quiz-back{color:var(--fg-mid);}
+.quiz-back:hover{color:var(--fg);}
+.result-time-block{background:linear-gradient(var(--bg-card),var(--bg-card)),var(--bg);}
+.result-time-label{color:var(--accent-text);}
+.result-step{border-bottom:1px solid var(--border);}
+.result-step:hover{background:var(--bg-alt);}
+.result-step-label{color:var(--fg-mid);}
+.result-step-product{color:var(--fg);}
+.result-retake{color:var(--fg-mid);border-color:var(--border);}
+.result-retake:hover{color:var(--fg);}
+
+/* ── ADDED 2026-08-11 (E5): multi-select, ranking, trust microcopy,
+      diagnosis summary, reasons, gaps. Reuses the existing token set and
+      component grammar — no new colours, type scale or spacing values. ── */
+.quiz-option[aria-pressed="true"] .quiz-rank{opacity:1;}
+.quiz-rank{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;flex-shrink:0;
+  border:1px solid var(--bronze);color:var(--accent-text);
+  font-family:var(--font-display);font-size:9px;font-weight:700;
+  opacity:0;transition:opacity .2s;
+}
+.quiz-option-head{display:flex;align-items:center;gap:10px;}
+.quiz-why{
+  margin-top:-32px;margin-bottom:36px;
+}
+.quiz-why-toggle{
+  background:none;border:none;padding:0;cursor:pointer;
+  font-family:var(--font-display);font-size:9px;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--fg-mid);
+  border-bottom:1px solid var(--border);
+}
+.quiz-why-toggle:hover{color:var(--fg);}
+.quiz-why-body{
+  display:none;margin-top:12px;max-width:520px;
+  font-family:var(--font-body);font-size:13px;line-height:1.6;color:var(--fg-mid);
+}
+.quiz-why-body.open{display:block;}
+.quiz-hint{
+  font-family:var(--font-body);font-size:12px;color:var(--fg-mid);
+  margin-top:-28px;margin-bottom:32px;
+}
+.result-summary{
+  border:1px solid var(--border);background:var(--bg-card);
+  padding:28px 32px;margin-bottom:48px;
+}
+.result-summary-title{
+  font-family:var(--font-display);font-size:9px;font-weight:700;
+  letter-spacing:.28em;text-transform:uppercase;
+  /* Theme-aware by necessity, both values measured: --bronze on the light card
+     is 2.3:1 (fails AA) while --accent-deep on the dark card is 3.12:1 (also
+     fails). Neither token passes in both modes, so each mode takes the one that
+     does — light 4.51:1, dark 6.19:1.
+     RESOLVED 2026-08-18. .result-time-label used --bronze in both modes and carried the
+     light-mode failure at 2.30:1 — on the RESULT screen, which axe has never reached because
+     it does not exist until seven questions are answered. So K12's "0 across 36 pages" was
+     true of what axe saw and false of the site. It now uses --accent-text (4.76:1 light,
+     already compliant dark). The earlier "deliberately NOT changed: experience-changing"
+     reasoning is superseded by the Founder's 2026-08-18 ruling that K12 is
+     IMPLEMENTATION-ONLY under rule 15's accessibility clause. */
+  color:var(--accent-deep);
+  margin-bottom:16px;
+}
+html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
+.result-summary-list{display:flex;flex-wrap:wrap;gap:8px;}
+.result-chip{
+  border:1px solid var(--border);padding:6px 12px;
+  font-family:var(--font-display);font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--fg);
+}
+.result-step-why{
+  font-family:var(--font-body);font-size:12px;line-height:1.5;
+  color:var(--fg-mid);margin-top:6px;
+}
+.result-step-meta{
+  font-family:var(--font-body);font-size:11px;line-height:1.5;
+  color:var(--fg-mid);margin-top:6px;font-style:italic;
+}
+.result-note{
+  border:1px solid var(--border);border-left:2px solid var(--bronze);
+  padding:20px 24px;margin-bottom:24px;
+  font-family:var(--font-body);font-size:13px;line-height:1.65;color:var(--fg-mid);
+}
+.result-note strong{color:var(--fg);font-weight:600;}
+@media (max-width:680px){
+  .quiz-why{margin-top:-24px;}
+  .result-summary{padding:22px 20px;}
+}
+
+/* ── ADDED 2026-09-29 (Amendment 1): image cards for the Skin Type and
+      Concerns steps. Image and label are one button, every image is the
+      same square crop (public/img/quiz, 480px WebP). ── */
+.quiz-option-media{
+  display:block;aspect-ratio:1/1;overflow:hidden;flex-shrink:0;
+  background:var(--bg-alt);border:1px solid var(--border);
+}
+.quiz-option-media img{
+  display:block;width:100%;height:100%;object-fit:cover;
+  transition:transform .4s;
+}
+.quiz-option:hover .quiz-option-media img{transform:scale(1.04);}
+.quiz-option.selected .quiz-option-media{border-color:var(--bronze);}
+
+/* Skin type — image left, text right */
+.quiz-option--row{
+  flex-direction:row;align-items:center;gap:20px;padding:12px 20px 12px 12px;
+}
+.quiz-option--row .quiz-option-media{width:112px;}
+.quiz-option--row .quiz-option-text{display:flex;flex-direction:column;gap:8px;}
+
+/* Concerns — image tile with the label underneath */
+.quiz-options--tiles{grid-template-columns:repeat(4,1fr);}
+.quiz-option--tile{padding:10px 10px 14px;gap:12px;position:relative;}
+.quiz-option--tile .quiz-option-head{justify-content:center;text-align:center;min-height:2.6em;}
+.quiz-option--tile .quiz-option-title{font-size:11px;line-height:1.3;}
+.quiz-option--tile .quiz-rank{
+  position:absolute;top:16px;left:16px;z-index:1;
+  width:24px;height:24px;font-size:10px;
+  background:var(--bg);
+}
+@media (max-width:860px){
+  .quiz-options--tiles{grid-template-columns:repeat(3,1fr);}
+}
+@media (max-width:680px){
+  .quiz-options--tiles{grid-template-columns:repeat(2,1fr);}
+  .quiz-option--row .quiz-option-media{width:88px;}
+}
+</style>
+  <!-- HERO -->
+  <header class="rf-hero">
+    <div class="container">
+      <p class="t-eyebrow reveal" style="margin-bottom:16px;">Personalised Skincare</p>
+      <h1 class="t-display reveal reveal-delay-1" style="max-width:800px; margin-bottom:24px;">FIND YOUR<br>ROUTINE</h1>
+      <span class="t-script reveal reveal-delay-2" style="display:block; margin-bottom:24px;">Tailored for you.</span>
+      <p class="t-body reveal reveal-delay-3" style="max-width:520px;">Answer 7 quick questions about your skin and we'll build a complete morning and evening routine using the right Kotiva products — in the right order.</p>
+    </div>
+  </header>
+
+  <!-- QUIZ -->
+  <section class="quiz-section" id="quiz-section">
+    <div class="container">
+      <div class="quiz-wrap">
+        <!-- PROGRESS -->
+        <div class="quiz-progress">
+          <div class="quiz-progress-dot active" id="pdot-0"></div>
+          <div class="quiz-progress-dot" id="pdot-1"></div>
+          <div class="quiz-progress-dot" id="pdot-2"></div>
+          <div class="quiz-progress-dot" id="pdot-3"></div>
+          <div class="quiz-progress-dot" id="pdot-4"></div>
+          <div class="quiz-progress-dot" id="pdot-5"></div>
+          <div class="quiz-progress-dot" id="pdot-6"></div>
+        </div>
+
+        <!-- STEP 1: ZONE -->
+        <div class="quiz-step active" id="step-0" data-field="zones" data-multi="true">
+          <div class="quiz-step-label">Step 01 of 07 — Where</div>
+          <h2 class="quiz-question">WHAT WOULD YOU<br>LIKE A ROUTINE FOR?</h2>
+          <p class="quiz-sub">Choose one or more. Kotiva's range covers face, body and hair.</p>
+          <div class="quiz-options" style="grid-template-columns:repeat(3,1fr);">
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="face">
+              <span class="quiz-option-head"><span class="quiz-option-title">Face</span></span>
+              <span class="quiz-option-desc">Cleansing, treatment, moisture and protection</span>
+            </button>
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="body">
+              <span class="quiz-option-head"><span class="quiz-option-title">Body</span></span>
+              <span class="quiz-option-desc">Hands, underarms and body care</span>
+            </button>
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="hair">
+              <span class="quiz-option-head"><span class="quiz-option-title">Hair</span></span>
+              <span class="quiz-option-desc">Scalp and hair-fall care</span>
+            </button>
+          </div>
+          <div class="quiz-nav"><span></span>
+            <button class="btn btn-primary" type="button" data-next id="next-0" disabled>Next &rarr;</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: SKIN TYPE -->
+        <div class="quiz-step" id="step-1" data-field="skinType">
+          <div class="quiz-step-label">Step 02 of 07 — Skin Type</div>
+          <h2 class="quiz-question">WHAT IS YOUR<br>SKIN TYPE?</h2>
+          <p class="quiz-sub">Select the option that best describes how your skin normally feels by midday.</p>
+          <div class="quiz-options">
+            <button class="quiz-option quiz-option--row" type="button" aria-pressed="false" data-value="oily">
+              <span class="quiz-option-media"><img src="{{ quiz.skin_oily }}" alt="" width="480" height="480" loading="lazy"></span>
+              <span class="quiz-option-text">
+                <span class="quiz-option-head"><span class="quiz-option-title">Oily</span></span>
+                <span class="quiz-option-desc">Shiny by midday, enlarged pores, prone to breakouts</span>
+              </span>
+            </button>
+            <button class="quiz-option quiz-option--row" type="button" aria-pressed="false" data-value="dry">
+              <span class="quiz-option-media"><img src="{{ quiz.skin_dry }}" alt="" width="480" height="480" loading="lazy"></span>
+              <span class="quiz-option-text">
+                <span class="quiz-option-head"><span class="quiz-option-title">Dry</span></span>
+                <span class="quiz-option-desc">Tight, flaky, or rough — especially after cleansing</span>
+              </span>
+            </button>
+            <button class="quiz-option quiz-option--row" type="button" aria-pressed="false" data-value="combination">
+              <span class="quiz-option-media"><img src="{{ quiz.skin_combination }}" alt="" width="480" height="480" loading="lazy"></span>
+              <span class="quiz-option-text">
+                <span class="quiz-option-head"><span class="quiz-option-title">Combination</span></span>
+                <span class="quiz-option-desc">Oily T-zone but dry or normal cheeks</span>
+              </span>
+            </button>
+            <button class="quiz-option quiz-option--row" type="button" aria-pressed="false" data-value="balanced">
+              <span class="quiz-option-media"><img src="{{ quiz.skin_balanced }}" alt="" width="480" height="480" loading="lazy"></span>
+              <span class="quiz-option-text">
+                <span class="quiz-option-head"><span class="quiz-option-title">Balanced</span></span>
+                <span class="quiz-option-desc">Comfortable and even, minimal shine</span>
+              </span>
+            </button>
+          </div>
+          <div class="quiz-why">
+            <button class="quiz-why-toggle" type="button" data-why>Why we ask this</button>
+            <div class="quiz-why-body">Your skin type decides which cleanser and sun protection suit you — Kotiva makes different formulas for oily and combination skin than for dry or balanced skin. Sensitivity is asked separately on the next step, because skin can be oily <em>and</em> reactive at the same time.</div>
+          </div>
+          <div class="quiz-nav">
+            <button class="quiz-back" type="button" data-back>&larr; Back</button>
+            <button class="btn btn-primary" type="button" data-next id="next-1" disabled>Next &rarr;</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: SENSITIVITY -->
+        <div class="quiz-step" id="step-2" data-field="sensitive">
+          <div class="quiz-step-label">Step 03 of 07 — Sensitivity</div>
+          <h2 class="quiz-question">DOES YOUR SKIN<br>REACT EASILY?</h2>
+          <p class="quiz-sub">Redness, stinging or discomfort with new products.</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="yes">
+              <span class="quiz-option-head"><span class="quiz-option-title">Yes, it reacts</span></span>
+              <span class="quiz-option-desc">I notice redness, tingling or irritation fairly easily</span>
+            </button>
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="no">
+              <span class="quiz-option-head"><span class="quiz-option-title">No, it tolerates well</span></span>
+              <span class="quiz-option-desc">I can use most products without a reaction</span>
+            </button>
+          </div>
+          <div class="quiz-why">
+            <button class="quiz-why-toggle" type="button" data-why>Why we ask this</button>
+            <div class="quiz-why-body">We ask this separately from your skin type so the two can be combined. If your skin reacts easily, we favour the formulas Kotiva describes as suitable for sensitive skin, and we follow Kotiva's own guidance on easing into their exfoliating serum. This is a preference filter, not medical advice — if you have a diagnosed skin condition, or you are pregnant or breastfeeding, please speak to your doctor or pharmacist.</div>
+          </div>
+          <div class="quiz-nav">
+            <button class="quiz-back" type="button" data-back>&larr; Back</button>
+            <button class="btn btn-primary" type="button" data-next id="next-2" disabled>Next &rarr;</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: CONCERNS (multi, ranked) -->
+        <div class="quiz-step" id="step-3" data-field="concerns" data-multi="true" data-max="3">
+          <div class="quiz-step-label">Step 04 of 07 — Your Concerns</div>
+          <h2 class="quiz-question">WHAT WOULD YOU<br>MOST LIKE TO CHANGE?</h2>
+          <p class="quiz-sub">Choose up to three, in order of importance. The first one you pick counts most.</p>
+          <div class="quiz-options quiz-options--tiles" id="opts-concerns"></div>
+          <p class="quiz-hint" id="concern-hint"></p>
+          <div class="quiz-why">
+            <button class="quiz-why-toggle" type="button" data-why>Why we ask this</button>
+            <div class="quiz-why-body">Ranking matters: where two Kotiva products could fill the same step, we choose the one that answers your first concern. If nothing in the range addresses something you picked, we tell you plainly on your results rather than substituting something unrelated.</div>
+          </div>
+          <div class="quiz-nav">
+            <button class="quiz-back" type="button" data-back>&larr; Back</button>
+            <button class="btn btn-primary" type="button" data-next id="next-3" disabled>Next &rarr;</button>
+          </div>
+        </div>
+
+        <!-- STEP 5: ROUTINE SIZE -->
+        <div class="quiz-step" id="step-4" data-field="routineSize">
+          <div class="quiz-step-label">Step 05 of 07 — Routine Size</div>
+          <h2 class="quiz-question">HOW MANY STEPS<br>SUIT YOUR DAY?</h2>
+          <p class="quiz-sub">A routine you actually keep beats a longer one you abandon.</p>
+          <div class="quiz-options" style="grid-template-columns:repeat(3,1fr);">
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="simple">
+              <span class="quiz-option-head"><span class="quiz-option-title">Simple</span></span>
+              <span class="quiz-option-desc">The essentials only — cleanse, moisturise, protect</span>
+            </button>
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="essentials">
+              <span class="quiz-option-head"><span class="quiz-option-title">Balanced</span></span>
+              <span class="quiz-option-desc">The essentials plus one targeted step</span>
+            </button>
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="full">
+              <span class="quiz-option-head"><span class="quiz-option-title">Complete</span></span>
+              <span class="quiz-option-desc">The full ritual, every step Kotiva offers you</span>
+            </button>
+          </div>
+          <div class="quiz-nav">
+            <button class="quiz-back" type="button" data-back>&larr; Back</button>
+            <button class="btn btn-primary" type="button" data-next id="next-4" disabled>Next &rarr;</button>
+          </div>
+        </div>
+
+        <!-- STEP 6: EXPERIENCE -->
+        <div class="quiz-step" id="step-5" data-field="experience">
+          <div class="quiz-step-label">Step 06 of 07 — Experience</div>
+          <h2 class="quiz-question">HOW EXPERIENCED<br>ARE YOU?</h2>
+          <p class="quiz-sub">This decides whether we include Kotiva's stronger exfoliating formulas.</p>
+          <div class="quiz-options" style="grid-template-columns:repeat(3,1fr);">
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="beginner">
+              <span class="quiz-option-head"><span class="quiz-option-title">New to Skincare</span></span>
+              <span class="quiz-option-desc">Just starting out, building a first routine</span>
+            </button>
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="intermediate">
+              <span class="quiz-option-head"><span class="quiz-option-title">Some Experience</span></span>
+              <span class="quiz-option-desc">Have a routine, ready to add actives</span>
+            </button>
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="advanced">
+              <span class="quiz-option-head"><span class="quiz-option-title">Experienced</span></span>
+              <span class="quiz-option-desc">Familiar with acids and stronger formulas</span>
+            </button>
+          </div>
+          <div class="quiz-why">
+            <button class="quiz-why-toggle" type="button" data-why>Why we ask this</button>
+            <div class="quiz-why-body">Two Kotiva products combine several exfoliating acids. If you are new to skincare we leave them out, and we never place two acid formulas in the same routine. Kotiva's own instructions for the Pores Off Serum describe easing in gradually, and we pass that guidance on to you as written.</div>
+          </div>
+          <div class="quiz-nav">
+            <button class="quiz-back" type="button" data-back>&larr; Back</button>
+            <button class="btn btn-primary" type="button" data-next id="next-5" disabled>Next &rarr;</button>
+          </div>
+        </div>
+
+        <!-- STEP 7: TEXTURE -->
+        <div class="quiz-step" id="step-6" data-field="texture">
+          <div class="quiz-step-label">Step 07 of 07 — Preference</div>
+          <h2 class="quiz-question">HOW DO YOU LIKE<br>TO CLEANSE?</h2>
+          <p class="quiz-sub">Kotiva makes several cleansers. If you have a preference, we'll honour it.</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="foam">
+              <span class="quiz-option-head"><span class="quiz-option-title">Foam</span></span>
+              <span class="quiz-option-desc">Light, airy lather from a pump</span>
+            </button>
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="gel">
+              <span class="quiz-option-head"><span class="quiz-option-title">Gel</span></span>
+              <span class="quiz-option-desc">Fresh, clarifying, rinses clean</span>
+            </button>
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="cream">
+              <span class="quiz-option-head"><span class="quiz-option-title">Cream</span></span>
+              <span class="quiz-option-desc">Softer and more cushioned on the skin</span>
+            </button>
+            <button class="quiz-option" type="button" aria-pressed="false" data-value="">
+              <span class="quiz-option-head"><span class="quiz-option-title">No preference</span></span>
+              <span class="quiz-option-desc">Choose whatever suits my skin best</span>
+            </button>
+          </div>
+          <div class="quiz-nav">
+            <button class="quiz-back" type="button" data-back>&larr; Back</button>
+            <button class="btn btn-bronze" type="button" id="build-btn" disabled>Build My Routine &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="result-section" id="result-section">
+    <div class="container">
+      <div class="result-header reveal">
+        <p class="t-eyebrow" style="text-align:center; margin-bottom:16px;">Your Personalised Routine</p>
+        <h2 class="t-headline" style="text-align:center; margin-bottom:12px;" id="result-title">YOUR KOTIVA ROUTINE</h2>
+        <p class="t-body" style="text-align:center;" id="result-subtitle">Tailored for your skin. In the right order.</p>
+      </div>
+
+      <div class="result-summary" id="result-summary" style="margin-top:48px;"></div>
+
+      <div class="result-routine-grid" id="result-grid"></div>
+
+      <div id="result-notes"></div>
+
+      <div class="result-actions">
+        <a href="{{ theme.settings.get('kotiva_url_shop') }}" class="btn btn-primary" id="shop-routine-cta">Shop These Products</a>
+        <a href="{{ theme.settings.get('kotiva_url_shop') }}" class="btn btn-outline">View Full Range</a>
+      </div>
+      <div style="text-align:center; margin-top:28px;">
+        <button class="result-retake" onclick="retakeQuiz()">← Retake the Quiz</button>
+      </div>
+    </div>
+  </section>
+

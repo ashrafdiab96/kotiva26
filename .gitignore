@@ -28,3 +28,11 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 .DS_Store
 
 
+
+# KOTIVA visual-regression captures (scripts/screenshot-pages.mjs)
+scratch/
+# Playwright
+test-results/
+playwright-report/
+# Operator-specific page map for the visual regression
+scripts/visual-pages.json

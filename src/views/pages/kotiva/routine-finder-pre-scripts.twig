@@ -1,0 +1,32 @@
+{#
+  Routine Finder — the reference's @push('pre_scripts'), with its one Laravel dependency
+  replaced.
+
+  The reference built window.KOTIVA.products from fetch('/api/products'), rows of
+  {id, sku, slug, name, image, url, filter_tags}. Here the same array is built from the SKU
+  map (id N ⇔ KOT{N:3}, verified for KOT001…KOT025 by scripts/export-reference-data.mjs)
+  joined to the live Salla catalog (kotiva-core.js: salla.product.fetch, cached in
+  sessionStorage for the session). Before the store answers, rows carry the exported Salla
+  product paths, so getById() works from the first click; once it answers, products no
+  longer sold on Salla drop out and URLs/images come from Salla itself. A miss still falls
+  back to the store, as in the reference.
+
+  routine-model.js and routine-engine.js are the reference files, unchanged
+  (scripts/sync-reference.mjs --check proves it).
+#}
+<script>
+  window.SALLA_STORE_URL = {{ store.url|trim('/', 'right')|json_encode|raw }};
+  window.KOTIVA_QUIZ_IMAGES = {
+    acne: {{ (theme.settings.get('routine_concern_acne') ?: 'kotiva/img/quiz/concern-acne.webp'|asset)|json_encode|raw }},
+    oil: {{ (theme.settings.get('routine_concern_oil') ?: 'kotiva/img/quiz/concern-oil.webp'|asset)|json_encode|raw }},
+    pigmentation: {{ (theme.settings.get('routine_concern_pigmentation') ?: 'kotiva/img/quiz/concern-pigmentation.webp'|asset)|json_encode|raw }},
+    hydration: {{ (theme.settings.get('routine_concern_hydration') ?: 'kotiva/img/quiz/concern-hydration.webp'|asset)|json_encode|raw }},
+    barrier: {{ (theme.settings.get('routine_concern_barrier') ?: 'kotiva/img/quiz/concern-barrier.webp'|asset)|json_encode|raw }},
+    scars: {{ (theme.settings.get('routine_concern_scars') ?: 'kotiva/img/quiz/concern-scars.webp'|asset)|json_encode|raw }},
+    ageing: {{ (theme.settings.get('routine_concern_ageing') ?: 'kotiva/img/quiz/concern-ageing.webp'|asset)|json_encode|raw }},
+    sun: {{ (theme.settings.get('routine_concern_sun') ?: 'kotiva/img/quiz/concern-sun.webp'|asset)|json_encode|raw }}
+  };
+</script>
+<script src="{{ 'kotiva-routine.js'|asset }}"></script>
+<script src="{{ 'kotiva/js/routine-model.js'|asset }}"></script>
+<script src="{{ 'kotiva/js/routine-engine.js'|asset }}"></script>

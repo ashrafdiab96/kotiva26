@@ -1,0 +1,25 @@
+{# The reference page's @push('scripts'), verbatim. #}
+<script>
+/* ── BUILD INGREDIENT LIBRARY ─────────────────────────── */
+(function() {
+  const grid = document.getElementById('ing-library-grid');
+  if (!grid) return;
+  /* HERO_INGREDIENTS schema is {name, benefit, description, products:[id]} —
+     this builder previously read a stale {claim, desc, found} shape and threw on
+     the first entry, leaving the whole grid empty (caught by the 2026-07-16
+     release-gate run, DEC-245). Product IDs resolve to names via the lite set. */
+  const nameById = {};
+  (KOTIVA.products || []).forEach(p => { nameById[p.id] = p.name; });
+  grid.innerHTML = KOTIVA.ingredients.filter(i => i.products.some(id => nameById[id])).map(i => `
+    <div class="actives-card" data-theme="editorial">
+      <div class="actives-card-header">
+        <div class="actives-card-name">${i.name}</div>
+        <div class="actives-card-claim">${i.benefit.split(' & ')[0]}</div>
+      </div>
+      <p class="actives-card-desc">${i.description}</p>
+      <div class="actives-card-products">
+        ${i.products.map(id => nameById[id] ? `<span class="actives-card-product">${nameById[id]}</span>` : '').join('')}
+      </div>
+    </div>`).join('');
+})();
+</script>
