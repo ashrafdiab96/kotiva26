@@ -1,7 +1,8 @@
 {#
-  KOTIVA home — the reference's pages/home.blade.php, one Salla home component per section
-  (components/home/kotiva-*.twig, registered in twilight.json with is_default so a fresh
-  install shows them in the reference order).
+  KOTIVA home — the reference's pages/home.blade.php. The twelve sections
+  (components/home/kotiva-*.twig) are included directly in the reference order, not through
+  the home component tag, so the theme editor cannot reorder or hide them (T-20). They read
+  theme.settings only, never a `component` variable.
 
 | Variable         | Type       | Description                                                         |
 |------------------|------------|---------------------------------------------------------------------|
@@ -22,5 +23,16 @@
 {% block main_attrs %} aria-label="Main content"{% endblock %}
 
 {% block content %}
-    {% component home %}
+    {% include "components.home.kotiva-hero" %}
+    {% include "components.home.kotiva-marquee" %}
+    {% include "components.home.kotiva-credentials" %}
+    {% include "components.home.kotiva-philosophy" %}
+    {% include "components.home.kotiva-categories" %}
+    {% include "components.home.kotiva-doctor" %}
+    {% include "components.home.kotiva-routine-cta" %}
+    {% include "components.home.kotiva-bestsellers" %}
+    {% include "components.home.kotiva-ingredients" %}
+    {% include "components.home.kotiva-standard" %}
+    {% include "components.home.kotiva-ritual" %}
+    {% include "components.home.kotiva-newsletter" %}
 {% endblock %}

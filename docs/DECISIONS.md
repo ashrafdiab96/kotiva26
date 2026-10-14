@@ -321,3 +321,13 @@ Done here:
 (its MySQL is not running) or browsers (Playwright's are not installed). That covers the e2e
 test, screenshot capture and comparison, console-error sweeps, RTL and the 390px pass. The README
 gives the operator the exact commands.
+
+## T-20 — Home is fixed-order
+
+`pages/index.twig` includes the twelve `components/home/kotiva-*.twig` sections directly, in the
+reference order, instead of rendering `{% component home %}`. The home must match the reference,
+and the editor-managed list let a store's saved component layout drift from it. The sections read
+`theme.settings` only, never a `component` variable, so they render the same when included. The
+`twilight.json` component entries stay, so the editor still lists them, but reordering or hiding
+them there has no effect on the storefront. Editor-managed home sections are deferred. This
+supersedes the "reorder or hide" sentence of T-13.
