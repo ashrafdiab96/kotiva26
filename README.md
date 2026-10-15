@@ -68,18 +68,21 @@ into **Theme settings → KOTIVA pages**.
 | Routine Finder | Routine Finder | Routine Finder page | Routine Finder — kotiva™ | Find your perfect kotiva™ skincare routine. Answer a few questions about your skin type and concerns. |
 | Privacy Policy | Privacy Policy | Privacy Policy page | Privacy Policy (Draft) — kotiva™ | How kotiva™ (Vitakode LLC) collects, uses, and protects your personal data. Draft template pending legal review. |
 | Terms | Terms | Terms of Use page | Terms & Conditions (Draft) — kotiva™ | The terms and conditions governing your use of the kotiva™ (Vitakode LLC) website. Draft template pending legal review. |
+| Journal | Journal | Journal page | Journal — kotiva™ | Skincare notes from kotiva™ — ingredients, routines and dermatology, explained. |
 
 If the id is not pasted, a page is still recognised when its body is just the marker
 `kotiva:<slug>` (`kotiva:about`, `kotiva:routine-finder`, …), or when its URL contains the slug.
 The nav and footer links need the id (or the full page URL) in Theme settings, though; until
 then they point at the store home.
 
-**Home and Journal need no page.** Home is the store root, set its SEO in the store's SEO
+**Home needs no page.** Home is the store root, set its SEO in the store's SEO
 settings to: *kotiva™ — Doctor-Approved Skincare* / *Doctor-approved skincare, perfected by
 science and tailored for you. Explore 25 products formulated with clinically proven ingredients
-across cleansers, serums, SPF, body and hair care.* The Journal is Salla's blog at `/blog`; until
-blog posts exist it shows the original "Coming soon" journal. Tag posts Ingredients / Routines /
-Dermatology / Education / Brand. **Shop** is `/latest-products`.
+across cleansers, serums, SPF, body and hair care.* The Journal is the Journal page above (Salla
+Blog is not available on the client store, see docs/DECISIONS.md T-21); it shows the original
+"Coming soon" journal. With the Journal page setting empty, Journal links fall back to Salla's
+blog at `/blog`, where blog posts tagged Ingredients / Routines / Dermatology / Education / Brand
+replace the teasers. **Shop** is `/latest-products`.
 
 **Products:** each Salla product's **SKU** must be its KOTIVA code (`KOT001` … `KOT025`). That
 is how the theme finds its category, skin type, concern, science text and related products. The

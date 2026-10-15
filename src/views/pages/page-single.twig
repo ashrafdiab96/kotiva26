@@ -21,7 +21,8 @@
 
 {% set kotiva_keys = {
   about: 'about', science: 'science', contact: 'contact', ingredients: 'ingredients',
-  routine_finder: 'routine-finder', privacy_policy: 'privacy-policy', terms: 'terms'
+  routine_finder: 'routine-finder', privacy_policy: 'privacy-policy', terms: 'terms',
+  journal: 'journal'
 } %}
 {% set kotiva_page = null %}
 {% set marker = (page.content ?? '')|striptags|trim|lower|replace({'[': '', ']': '', ' ': ''}) %}

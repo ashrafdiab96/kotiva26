@@ -331,3 +331,14 @@ and the editor-managed list let a store's saved component layout drift from it. 
 `twilight.json` component entries stay, so the editor still lists them, but reordering or hiding
 them there has no effect on the storefront. Editor-managed home sections are deferred. This
 supersedes the "reorder or hide" sentence of T-13.
+
+## T-21 — Journal routed to an information page
+
+Salla Blog is not available on the client store, so `/blog` cannot serve the Journal. A new
+Theme setting, `kotiva_page_journal` (Theme settings → "KOTIVA pages"), takes a Salla page ID or
+full URL like the other `kotiva_page_*` settings, and `components/kotiva/urls.twig` resolves
+`kotiva_url_journal` from it, so the header, footer, home and every other Journal link follow it.
+`pages/page-single.twig` recognises that page as the `journal` KOTIVA page and renders
+`pages/kotiva/journal.twig` there. When the setting is empty, Journal links fall back to `/blog`
+as before. The journal listing and article templates (`pages/blog/index.twig`,
+`pages/blog/single.twig`) are unchanged.

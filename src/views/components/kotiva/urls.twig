@@ -6,19 +6,20 @@
 
   Salla pages have no fixed slug-based URL (/<title-slug>/page-<id>), so each KOTIVA page is
   configured in Theme settings by page ID (→ /redirect/pages/<id>, Salla's stable link) or by
-  full URL. An unconfigured page links to the store home rather than to a dead URL.
-  See docs/DECISIONS.md T-05.
+  full URL. An unconfigured page links to the store home rather than to a dead URL — except
+  the Journal, which falls back to Salla's blog (/blog). See docs/DECISIONS.md T-05, T-21.
 #}
 {% set _kotiva = theme.settings.set('kotiva_url_home', store.url) %}
 {% set _kotiva = theme.settings.set('kotiva_url_shop', link('latest-products')) %}
 {% set _kotiva = theme.settings.set('kotiva_url_cart', link('cart')) %}
-{% set _kotiva = theme.settings.set('kotiva_url_journal', link('blog')) %}
-{% for key in ['about', 'science', 'contact', 'ingredients', 'routine_finder', 'privacy_policy', 'terms'] %}
+{% for key in ['about', 'science', 'contact', 'ingredients', 'routine_finder', 'privacy_policy', 'terms', 'journal'] %}
   {% set ref = (theme.settings.get('kotiva_page_' ~ key) ?? '')|trim %}
   {% if ref matches '/^\\d+$/' %}
     {% set url = link('redirect/pages/' ~ ref) %}
   {% elseif ref != '' %}
     {% set url = ref %}
+  {% elseif key == 'journal' %}
+    {% set url = link('blog') %}
   {% else %}
     {% set url = store.url %}
   {% endif %}

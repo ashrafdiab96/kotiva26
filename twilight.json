@@ -106,6 +106,17 @@
             "placeholder": null
         },
         {
+            "type": "string",
+            "icon": "sicon-link",
+            "id": "kotiva_page_journal",
+            "label": "Journal page",
+            "description": "Salla page ID (e.g. 1085608773) or full page URL.",
+            "format": "text",
+            "required": false,
+            "value": "",
+            "placeholder": null
+        },
+        {
             "type": "static",
             "id": "kotiva-line-1",
             "format": "line"
